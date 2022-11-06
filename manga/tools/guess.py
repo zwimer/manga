@@ -234,7 +234,7 @@ def guess_single(raw: Path, data: Dict[str, Path], yes: bool, force: bool, dryru
 
     # Act on prompt input
     if accept == "y":
-        mv(old, gl_trash_d / old_base, dryrun=dryrun)
+        mv(old, trash / old_base, dryrun=dryrun)
         mv(raw, old.parent / new_base, dryrun=dryrun)
         return True
     elif accept == "?":
@@ -258,7 +258,6 @@ def guess(directory: Path, files: List[Path], yes: bool, force: bool, dryrun: bo
     If dryrun, nothing is actually done
     returns False on failure
     """
-    # Resolve paths + sanity checks
     directory: Path = directory.resolve()
     assert directory.exists(), f"{directory} does not exist"
     assert directory.is_dir(), f"{directory} is not a directory"
@@ -269,7 +268,7 @@ def guess(directory: Path, files: List[Path], yes: bool, force: bool, dryrun: bo
         assert i.is_file(), f"Will not guess non-file: {i}"
     # Make trash directory
     if not dryrun:
-        gl_trash_d.mkdir(exist_ok=True)
+        trash.mkdir(exist_ok=True)
     # For each file, try to guess
     data: Dict[str, Path] = read_dir(directory)
     fails: List[Path] = []
@@ -297,7 +296,7 @@ def main(prog: str, *args: str) -> bool:
     parser.add_argument("-f", "--force", action="store_true", help="Override safety checks")
     parser.add_argument("-y", "--yes", action="store_true", help="Automatically accept changes; will never prompt the user")
     parser.add_argument("-n", "--dryrun", action="store_true", help="Do not actually change anything")
-    parser.add_argument("-d", "--directory", type=Path,
+    parser.add_argument("-d", "--directory", type=Path, required=True,
         help="The files in this directory will be what the input files are compared against")
     parser.add_argument("files", type=Path, nargs="+", help="The files to guess")
     ns = parser.parse_args(args)
