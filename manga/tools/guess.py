@@ -291,7 +291,7 @@ def guess(directory: Path, files: List[Path], yes: bool, force: bool, dryrun: bo
     return True
 
 
-def cli(prog: str, *args: str) -> bool:
+def main(prog: str, *args: str) -> bool:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
     parser = argparse.ArgumentParser(prog=os.path.basename(prog))
     parser.add_argument("-f", "--force", action="store_true", help="Override safety checks")
