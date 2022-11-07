@@ -11,7 +11,7 @@ def get_domain(url: str) -> str:
     """
     Extract the domain portion of a URL
     """
-    info: str = tldextract.extract(url)
+    info: tldextract.tldextract.ExtractResult = tldextract.extract(url)
     return f"{info.domain}.{info.suffix}"
 
 

@@ -12,7 +12,7 @@ from manga.utils import split_on_num, extract_url, lsf, mv
 
 # Config
 trash: Path = Path.home() / ".Trash/guess-manga/"
-max_chapter: int = 2500  # Higher has a increased chance of error
+max_chapter: int = 2500  # Higher has an increased chance of error
 
 
 ######################################################################
@@ -39,7 +39,10 @@ def read_dir(d: Path, *, remove_numbers: bool = False) -> Dict[str, Path]:
     if len(duplicates) > 0:
         disp_warning(f"Warning: duplicated files in: {d}")
         print("\nIgnoring the following sets of files:")
-        print(",\n".join((i + ": {\n\t" + ",\n\t".join(k) + "\n") for i,k in duplicates))
+        print(",\n".join(
+            (i + ": {\n\t" + ",\n\t".join(str(j) for j in k) + "\n")
+            for i,k in duplicates
+        ))
     return { i:k[0] for i,k in scrub_to_file.items() if len(k) == 1 }
 
 
@@ -130,9 +133,10 @@ def are_same(guessing: str, compare_to: str) -> bool:
             weird &= (compare_to_ch <= max_chapter and guessing_ch > compare_to_ch)
     except ValueError:  # The float conversion failed, links did not match
         return False
-    if weird:
-        print(f"Sanity check failed:\n\tNew: {guessing}\n\tOld: {compare_to}\nAre these the same? [y/N]")
-        return "y" == input()
+    if not weird:
+        return True
+    print(f"Sanity check failed:\n\tNew: {guessing}\n\tOld: {compare_to}\nAre these the same? [y/N]")
+    return "y" == input()
 
 
 def choose(x: Any, near: Sequence[Any]) -> Union[Any, None]:
@@ -144,7 +148,7 @@ def choose(x: Any, near: Sequence[Any]) -> Union[Any, None]:
     if len(near) == 1:
         return near[0]
     print(f"What is nearest to: {x}")
-    st: Callable[[str], str] = lambda x: f"{x}.".ljust(3) + " "
+    st: Callable[[int], str] = lambda x: f"{x}.".ljust(3) + " "
     for i,k in enumerate(near):
         print(f"\t{st(i)}{k}")
     print(f"\t{st(len(near))}None of the above")
@@ -208,7 +212,7 @@ def guess_single(raw: Path, data: Dict[str, Path], yes: bool, force: bool, dryru
     new_base: str = left + str(int(new_n) if new_n == int(new_n) else new_n) + raw.suffix
 
     # Determine danger level
-    diff: int = new_n - old_n
+    diff: float = new_n - old_n
     serious_warn: bool = diff <= 0 or diff > 50
     warn: bool = serious_warn or diff == 0 or diff > 3
 
@@ -256,7 +260,7 @@ def guess(directory: Path, files: List[Path], yes: bool, force: bool, dryrun: bo
     If dryrun, nothing is actually done
     returns False on failure
     """
-    directory: Path = directory.resolve()
+    directory = directory.resolve()
     assert directory.exists(), f"{directory} does not exist"
     assert directory.is_dir(), f"{directory} is not a directory"
     for i in files:

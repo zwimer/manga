@@ -33,7 +33,7 @@ def inc_chapter(file: Path, url_only: bool, yes: bool, dryrun: bool) -> bool:
     Increment the number in both the URL and name of file
     """
     absolute: Path = file.absolute()
-    file: Path = file.resolve()
+    file = file.resolve()
     assert file == absolute, f"{file} should not contain symlinks"
     assert file.exists(), f"{file} does not exist"
     assert file.is_file(), f"{file} is not a file"

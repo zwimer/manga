@@ -34,20 +34,23 @@ class ThreadHandler(ThreadPoolExecutor):
             i.cancel()
 
 
+mk_open_remaining_first: bool = True
+
+
 def mk_open_remaining(executor, urls, tested) -> Callable[[int, Any], None]:
     """
     Return a signal handler to open the remaining tested URLs
     """
     def handler(_: int, _2: Any) -> None:
-        if not mk_open_remaining.first:
+        global mk_open_remaining_first  # pylint: disable=global-statement
+        if not mk_open_remaining_first:
             os._exit(1)  # pylint: disable=protected-access
-        mk_open_remaining.first = False
+        mk_open_remaining_first = False
         print("Terminating executor...")
         executor.kill()
         handle_results(urls, tested)
         os._exit(0)  # pylint: disable=protected-access
     return handler
-mk_open_remaining.first=True
 
 
 ######################################################################

@@ -1,3 +1,4 @@
+import concurrent.futures
 from concurrent.futures.thread import ThreadPoolExecutor
 from typing import Optional, Callable, List, Type, Set, Any
 from functools import lru_cache
@@ -20,8 +21,8 @@ from manga import sites
 class ThreadHandler(ThreadPoolExecutor):
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self.futures = []
-    def add(self, fn: Callable[Any, Any], *args: Any, **kwargs: Any) -> None:
+        self.futures: List[concurrent.futures.Future] = []
+    def add(self, fn: Callable[..., Any], *args: Any, **kwargs: Any) -> None:
         self.futures.append(super().submit(fn, *args, **kwargs))
     def kill(self):
         self.shutdown(wait=False)

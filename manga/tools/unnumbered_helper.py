@@ -16,7 +16,7 @@ def scrub(url: str) -> str:
     """
     Scrub a URL for easy comparison with others
     """
-    url: str = "".join(url.split("//")[1:])
+    url = "".join(url.split("//")[1:])
     if "." in url[:4]:
         url = url.split(".", 1)[1]
     if url.endswith("/"):
