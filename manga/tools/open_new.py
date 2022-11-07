@@ -1,6 +1,3 @@
-from manga.utils import extract_url, lsf
-from manga import sites
-
 from concurrent.futures.thread import ThreadPoolExecutor
 from concurrent.futures import Future
 from typing import Callable, Dict, List, Set, Any
@@ -15,6 +12,9 @@ import os
 
 import requests
 import tqdm
+
+from manga.utils import extract_url, lsf
+from manga import sites
 
 
 ######################################################################
@@ -40,12 +40,12 @@ def mk_open_remaining(executor, urls, tested) -> Callable[[int, Any], None]:
     """
     def handler(_: int, _2: Any) -> None:
         if not mk_open_remaining.first:
-            os._exit(1)
+            os._exit(1)  # pylint: disable=protected-access
         mk_open_remaining.first = False
         print("Terminating executor...")
         executor.kill()
         handle_results(urls, tested)
-        os._exit(0)
+        os._exit(0)  # pylint: disable=protected-access
     return handler
 mk_open_remaining.first=True
 

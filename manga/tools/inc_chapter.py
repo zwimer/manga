@@ -1,10 +1,10 @@
-from manga.utils import extract_url_from_contents, split_on_num, mv
-
 from typing import Tuple, List
 from pathlib import Path
 import argparse
 import sys
 import os
+
+from manga.utils import extract_url_from_contents, split_on_num, mv
 
 
 def inc_str(x: str) -> str:

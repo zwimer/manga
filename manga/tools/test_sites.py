@@ -1,6 +1,3 @@
-from manga.utils import extract_url, lsf, split_on_num
-from manga import sites
-
 from concurrent.futures.thread import ThreadPoolExecutor
 from typing import Optional, Callable, List, Type, Set, Any
 from functools import lru_cache
@@ -15,6 +12,9 @@ import os
 
 from tqdm import tqdm
 import requests
+
+from manga.utils import extract_url, lsf, split_on_num
+from manga import sites
 
 
 class ThreadHandler(ThreadPoolExecutor):

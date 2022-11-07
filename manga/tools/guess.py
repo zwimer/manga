@@ -1,14 +1,13 @@
-from manga.utils import split_on_num, extract_url, lsf, mv
-
-from typing import Sequence, Optional, Union, Tuple, Dict, List, Any
+from typing import Sequence, Optional, Callable, Union, Tuple, Dict, List, Any
 from pathlib import Path
 import collections
 import platform
 import argparse
-import string
 import sys
 import re
 import os
+
+from manga.utils import split_on_num, extract_url, lsf, mv
 
 
 # Config
@@ -56,7 +55,7 @@ def remove_unwanted_periods(x: str) -> str:
     Remove periods that are not part of a number
     Numbers are assumed to start and end with a digit, not a decimal point
     """
-    for offset, pat in enumerate(("\.[^\d]", "[^\d]\.")):
+    for offset, pat in enumerate((r"\.[^\d]", r"[^\d]\.")):
         res: Optional[re.Match] = re.compile(pat).search(x)
         if res is not None:
             idx: int = offset + x.find(res.group())
@@ -90,7 +89,7 @@ def scrub(x: str, *, remove_numbers: bool = False) -> str:
         x = re.sub(r"\d", "", x)
 
     # Clean
-    x = re.sub("[^a-z\. \d]", " ", x)
+    x = re.sub(r"[^a-z\. \d]", " ", x)
     x = remove_unwanted_periods(x)
     while "  " in x:
         x = x.replace("  ", " ")
@@ -116,8 +115,8 @@ def are_same(guessing: str, compare_to: str) -> bool:
     compare_to may not contain guessing, and guessing must contain a chapter!
     """
     assert guessing != compare_to, f"{guessing} already exists"
-    assert compare_to not in guessing, \
-        f"{compare_to} contains the URL being guessed: {guessing}" # Ex. (ch 1.1 reverting to ch 1)
+    # Ex. (ch 1.1 reverting to ch 1)
+    assert compare_to not in guessing, f"{compare_to} contains the URL being guessed: {guessing}"
     # Remove identical components
     a, b = diff_helper(guessing, compare_to)
     a, b = diff_helper(a[::-1], b[::-1])
@@ -132,9 +131,8 @@ def are_same(guessing: str, compare_to: str) -> bool:
     except ValueError:  # The float conversion failed, links did not match
         return False
     if weird:
-        return True
         print(f"Sanity check failed:\n\tNew: {guessing}\n\tOld: {compare_to}\nAre these the same? [y/N]")
-        return input() == "y"
+        return "y" == input()
 
 
 def choose(x: Any, near: Sequence[Any]) -> Union[Any, None]:
@@ -152,7 +150,7 @@ def choose(x: Any, near: Sequence[Any]) -> Union[Any, None]:
     print(f"\t{st(len(near))}None of the above")
     try:
         choice = int(input())
-        assert choice >= 0 and choice <= len(near), "Invalid choice."
+        assert 0 <= choice <= len(near), "Invalid choice."
         if choice == len(near):
             return None
         return near[choice]

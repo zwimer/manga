@@ -1,10 +1,10 @@
-from manga.utils import mv
-
 from typing import Dict, List
 from pathlib import Path
 import argparse
 import sys
 import os
+
+from manga.utils import mv
 
 
 swap: Dict[str, str] = {

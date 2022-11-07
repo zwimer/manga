@@ -1,5 +1,3 @@
-from manga.utils import split_on_num, extract_url, lsf
-
 from typing import Optional, Tuple, Dict, List
 from pathlib import Path
 import collections
@@ -11,18 +9,20 @@ import os
 
 import osascript
 
+from manga.utils import split_on_num, extract_url, lsf
+
 
 def scrub(url: str) -> str:
     """
-    Scrub a URL for easy comparrison with others
+    Scrub a URL for easy comparison with others
     """
     url: str = "".join(url.split("//")[1:])
     if "." in url[:4]:
-        url = ".".join(url.split(".")[1:])
+        url = url.split(".", 1)[1]
     if url.endswith("/"):
         url = url[:-1]
     if "?" in url:
-        url = url.split("?")[0]
+        url = url.split("?", 1)[0]
     return url
 
 

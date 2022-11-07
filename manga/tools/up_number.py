@@ -1,9 +1,9 @@
-from manga.utils import split_on_num, mv
-
 from pathlib import Path
 import argparse
 import sys
 import os
+
+from manga.utils import split_on_num, mv
 
 
 def up_number(file: Path, number: int, yes: bool) -> bool:
