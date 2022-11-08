@@ -127,10 +127,10 @@ def are_same(guessing: str, compare_to: str) -> bool:
     weird: bool
     try:
         guessing_ch = float(a[::-1])
-        weird = (guessing_ch <= max_chapter)
+        weird = (guessing_ch > max_chapter)
         if len(b):
             compare_to_ch = float(b[::-1])
-            weird &= (compare_to_ch <= max_chapter and guessing_ch > compare_to_ch)
+            weird &= (compare_to_ch > max_chapter or guessing_ch > compare_to_ch)
     except ValueError:  # The float conversion failed, links did not match
         return False
     if not weird:
