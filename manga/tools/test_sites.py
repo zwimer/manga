@@ -105,7 +105,6 @@ class Broken(ToOpen):
 
 @lru_cache(maxsize=None)
 def _test_site(url: str):
-    print(f"Testing: {url}", flush=True)
     return sites.test(url)
 
 
