@@ -103,6 +103,24 @@ class Broken(ToOpen):
 ######################################################################
 
 
+@lru_cache(maxsize=None)
+def _test_site(url: str):
+    print(f"Testing: {url}", flush=True)
+    return sites.test(url)
+
+
+def _test(left: str, right: str, x: float) -> bool:
+    """
+    Test if chapter x is found at a URL constructed from left, right, and x
+    """
+    if int(x) == x:
+        return _test_site(f"{left}{int(x)}{right}")
+    else:
+        if _test_site(f"{left}{x}{right}"):
+            return True
+        return _test_site(f"{left}{str(x).replace('.', '-')}{right}")
+
+
 def _evaluate(url: str) -> Optional[Failed]:
     """
     If url is broken, return a failure class for it
@@ -114,10 +132,9 @@ def _evaluate(url: str) -> Optional[Failed]:
         return NotInt(url)
     elif n <= 5:
         return Tiny(url)
-    elif "mangabuddy" in left and any(i.isalpha() for i in right):
+    elif "mangabuddy" in left and ("/mbx" in left or any(i.isalpha() for i in right)):
         return Pattern(url)
-    ch = lambda x: f"{left}{str(int(x) if int(x) == x else x)}{right}"
-    test = lambda x: lru_cache(maxsize=None)(sites.test)(ch(x))
+    test = lambda x: _test(left, right, x)
     try:
         if test(n) and not test(n-1) and not test(5):
             return Exists(url)
