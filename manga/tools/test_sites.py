@@ -177,7 +177,7 @@ def print_each(prefix: str, lst: List[Failed]):
     """
     if lst:
         lst = sorted(lst, key=lambda x: x.url)
-        print(f"{prefix}\n\t" + "\t".join(str(i) for i in lst))
+        print(f"{prefix}\n\t" + "\n\t".join(str(i) for i in lst))
 
 
 def open_each(prefix: str, lst: List[Failed]) -> None:
