@@ -17,9 +17,8 @@ def mangakakalot_tv(data: str) -> bool:
     return "next-chap:hover" in data and "logo_chapter" in data
 
 def mangakakalot_com(data: str) -> bool:
-    return "/content/nextchap.png" not in data and \
-        "Sorry, the page you have requested cannot be found. Click" not in data and \
-        "already has 0 views." not in data
+    return "You just finished reading" in data and \
+    "Sorry, the page you have requested cannot be found. Click" not in data
 
 def mangakakalots_com(data: str) -> bool:
     return "500 Internal Server Error" not in data and \
