@@ -1,9 +1,10 @@
 from concurrent.futures.thread import ThreadPoolExecutor
 from concurrent.futures import Future
-from typing import Callable, Union, Dict, List, Set, Any
+from typing import Callable, Union, List, Set, Any
 from pathlib import Path
 import subprocess
 import argparse
+from dataclasses import dataclass, astuple, field
 import platform
 import signal
 import time
@@ -18,6 +19,18 @@ from manga import sites
 
 
 mk_open_remaining_first: bool = True
+
+
+@dataclass
+class Tested:
+    """
+    The results of testing every URL
+    """
+    has_new: Set[str] = field(default_factory=set)
+    ignore: Set[str] = field(default_factory=set)
+    failed: Set[str] = field(default_factory=set)
+    unknown: Set[str] = field(default_factory=set)
+
 
 
 ######################################################################
@@ -68,40 +81,40 @@ def domain_in(url: str, values: Set[str]) -> bool:
         return False
 
 
-def evaluate(url: str, tested: Dict[str, Set[str]], pbar: tqdm.std.tqdm) -> None:
+def evaluate(url: str, tested: Tested, pbar: tqdm.std.tqdm) -> None:
     """
     Determine if url has a new chapter or not
     Store the result in tested and update pbar
     """
     try:
-        tested["open" if sites.test(url) else "ignore"].add(url)
+        (tested.has_new if sites.test(url) else tested.ignore).add(url)
     except sites.UnknownDomain:
-        tested["unknown"].add(url)
+        tested.unknown.add(url)
     except requests.exceptions.RequestException:
-        tested["failed"].add(url)
+        tested.failed.add(url)
     finally:
         pbar.update()
 
 
-def handle_results(urls: Set[str], tested: Dict[str, Set[str]]) -> None:
+def handle_results(urls: Set[str], tested: Tested) -> None:
     """
     Print out the test results and open each of the given URLs that should not be ignored
     """
-    if len(tested["unknown"]) > 0:
+    if len(tested.unknown) > 0:
         print("The following domains were not known:")
-        print("\t" + "\n\t".join(sorted(tested["unknown"])))
-    if len(tested["failed"]) > 0:
+        print("\t" + "\n\t".join(sorted(tested.unknown)))
+    if len(tested.failed) > 0:
         print("The following domains could not be opened:")
-        print("\t" + "\n\t".join(sorted(tested["failed"])))
-    all_tested = set().union(*[ k for _, k in tested.items() ])
+        print("\t" + "\n\t".join(sorted(tested.failed)))
+    all_tested = set().union(*astuple(tested))
     if len(all_tested) != len(urls):
         print("The following domains were not tested:")
         print("\t" + "\n\t".join(sorted(urls - all_tested)))
         print("Assuming all remaining URLs must be opened...")
     print("Opening manga...")
-    for url in tqdm.tqdm(urls - tested["ignore"]):
+    for url in tqdm.tqdm(urls - tested.ignore):
         subprocess.check_call(["open", url], stdout=subprocess.DEVNULL,)
-        time.sleep(.2)  # Don't kill the machine
+        time.sleep(.2)  # Rate limit
 
 
 def open_new(directory: Path, skip: Union[Set[str], List[str]] = set()) -> bool:
@@ -117,26 +130,21 @@ def open_new(directory: Path, skip: Union[Set[str], List[str]] = set()) -> bool:
     # Determine which requests must be made
     print("Scanning files...")
     urls: Set[str] = { extract_url(i) for i in lsf(directory) }
-    tested: Dict[str, Set[str]] = {
-        "open" : set(),
-        "ignore" : set(),
-        "failed" : set(),
-        "unknown" : set(),
-    }
+    results = Tested()
     # Determine what to open
     print(f"Making at most {len(urls)} requests...")
     original_sigint_handler: Any = signal.getsignal(signal.SIGINT)
     with tqdm.tqdm(total=len(urls)) as pbar:
         with ThreadHandler(max_workers=32) as executor: # No DOS-ing
-            signal.signal(signal.SIGINT, mk_open_remaining(executor, urls, tested))
+            signal.signal(signal.SIGINT, mk_open_remaining(executor, urls, results))
             for i in urls:
                 if domain_in(i, skip):
-                    tested["ignore"].add(i)
+                    results.ignore.add(i)
                 else:
-                    executor.add(evaluate, i, tested, pbar)
+                    executor.add(evaluate, i, results, pbar)
     signal.signal(signal.SIGINT, original_sigint_handler)
     # Open links
-    handle_results(urls, tested)
+    handle_results(urls, results)
     return True
 
 
