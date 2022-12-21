@@ -128,10 +128,11 @@ def open_new(directory: Path, skip: Union[Set[str], List[str]]) -> bool:
         with ThreadHandler(max_workers=32) as executor: # No DOS-ing
             signal.signal(signal.SIGINT, mk_open_remaining(executor, urls, results))
             for i in urls:
-                if sites.get_domain(i) in skip:
-                    results.ignore.add(i)
-                else:
+                if sites.get_domain(i) not in skip:
                     executor.add(evaluate, i, results, pbar)
+                else:
+                    results.ignore.add(i)
+                    pbar.update()
     signal.signal(signal.SIGINT, original_sigint_handler)
     # Open links
     handle_results(urls, results)
