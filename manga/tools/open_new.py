@@ -1,6 +1,6 @@
 from concurrent.futures.thread import ThreadPoolExecutor
 from concurrent.futures import Future
-from typing import Callable, Dict, List, Set, Any
+from typing import Callable, Union, Dict, List, Set, Any
 from pathlib import Path
 import subprocess
 import argparse
@@ -15,6 +15,9 @@ import tqdm
 
 from manga.utils import extract_url, lsf
 from manga import sites
+
+
+mk_open_remaining_first: bool = True
 
 
 ######################################################################
@@ -32,9 +35,6 @@ class ThreadHandler(ThreadPoolExecutor):
         self.shutdown(wait=False)
         for i in self.futures:
             i.cancel()
-
-
-mk_open_remaining_first: bool = True
 
 
 def mk_open_remaining(executor, urls, tested) -> Callable[[int, Any], None]:
@@ -56,6 +56,16 @@ def mk_open_remaining(executor, urls, tested) -> Callable[[int, Any], None]:
 ######################################################################
 #                           Main Functions                           #
 ######################################################################
+
+
+def domain_in(url: str, values: Set[str]) -> bool:
+    """
+    :return: True iff url's domain is in values
+    """
+    try:
+        return sites.get_domain(url) in values
+    except Exception as e:
+        return False
 
 
 def evaluate(url: str, tested: Dict[str, Set[str]], pbar: tqdm.std.tqdm) -> None:
@@ -94,10 +104,12 @@ def handle_results(urls: Set[str], tested: Dict[str, Set[str]]) -> None:
         time.sleep(.2)  # Don't kill the machine
 
 
-def open_new(directory: Path) -> bool:
+def open_new(directory: Path, skip: Union[Set[str], List[str]] = set()) -> bool:
     """
     Open each file in directory that has a new chapter ready
     """
+    if isinstance(skip, list):
+        return open_new(directory, set(skip))
     print("Checking arguments...")
     directory = directory.resolve()
     assert directory.exists(), f"{directory} does not exist"
@@ -115,10 +127,13 @@ def open_new(directory: Path) -> bool:
     print(f"Making at most {len(urls)} requests...")
     original_sigint_handler: Any = signal.getsignal(signal.SIGINT)
     with tqdm.tqdm(total=len(urls)) as pbar:
-        with ThreadHandler(max_workers=32) as executor: # No DDOS-ing
+        with ThreadHandler(max_workers=32) as executor: # No DOS-ing
             signal.signal(signal.SIGINT, mk_open_remaining(executor, urls, tested))
             for i in urls:
-                executor.add(evaluate, i, tested, pbar)
+                if domain_in(i, skip):
+                    tested["ignore"].add(i)
+                else:
+                    executor.add(evaluate, i, tested, pbar)
     signal.signal(signal.SIGINT, original_sigint_handler)
     # Open links
     handle_results(urls, tested)
@@ -128,6 +143,7 @@ def open_new(directory: Path) -> bool:
 def main(prog: str, *args: str) -> bool:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
     parser = argparse.ArgumentParser(prog=os.path.basename(prog))
+    parser.add_argument("--skip", type=str, nargs="+", default=[], help="Domains to skip")
     parser.add_argument("directory", type=Path, help="The directory to open new items from")
     return open_new(**vars(parser.parse_args(args)))
 
