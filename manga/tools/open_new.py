@@ -71,16 +71,6 @@ def mk_open_remaining(executor, urls, tested) -> Callable[[int, Any], None]:
 ######################################################################
 
 
-def domain_in(url: str, values: Set[str]) -> bool:
-    """
-    :return: True iff url's domain is in values
-    """
-    try:
-        return sites.get_domain(url) in values
-    except Exception as e:
-        return False
-
-
 def evaluate(url: str, tested: Tested, pbar: tqdm.std.tqdm) -> None:
     """
     Determine if url has a new chapter or not
@@ -117,7 +107,7 @@ def handle_results(urls: Set[str], tested: Tested) -> None:
         time.sleep(.2)  # Rate limit
 
 
-def open_new(directory: Path, skip: Union[Set[str], List[str]] = set()) -> bool:
+def open_new(directory: Path, skip: Union[Set[str], List[str]]) -> bool:
     """
     Open each file in directory that has a new chapter ready
     """
@@ -138,7 +128,7 @@ def open_new(directory: Path, skip: Union[Set[str], List[str]] = set()) -> bool:
         with ThreadHandler(max_workers=32) as executor: # No DOS-ing
             signal.signal(signal.SIGINT, mk_open_remaining(executor, urls, results))
             for i in urls:
-                if domain_in(i, skip):
+                if sites.get_domain(i) in skip:
                     results.ignore.add(i)
                 else:
                     executor.add(evaluate, i, results, pbar)

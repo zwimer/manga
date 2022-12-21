@@ -28,7 +28,7 @@ def read_dir(d: Path, *, remove_numbers: bool = False) -> Dict[str, Path]:
     Return a dict mapping the scrubbed URLs they contain to the files within
     Fails if two files contain the same URLs after scrubbing
     """
-    files: Tuple[Path] = lsf(d)
+    files: Tuple[Path, ...] = lsf(d)
     scrub_to_file: Dict[str, List[Path]] = collections.defaultdict(list)
     for f in files:
         scb: str = scrub(extract_url(f), remove_numbers=remove_numbers)
@@ -181,6 +181,7 @@ def disp_warning(x: str) -> None:
     print("\n".join((boarder, blank, middle, blank, boarder)))
 
 
+#pylint: disable=too-many-locals
 def guess_single(raw: Path, data: Dict[str, Path], yes: bool, force: bool, dryrun: bool) -> bool:
     """
     Try to replace the file in old for the same manga with raw, editing the title as needed

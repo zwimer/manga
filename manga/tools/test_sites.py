@@ -120,6 +120,7 @@ def _test(left: str, right: str, x: float) -> bool:
         return _test_site(f"{left}{str(x).replace('.', '-')}{right}")
 
 
+# pylint: disable=too-many-return-statements,too-many-branches
 def _evaluate(url: str) -> Optional[Failed]:
     """
     If url is broken, return a failure class for it
@@ -217,10 +218,10 @@ def test_sites(directory: Path) -> bool:
         lambda lst, t: [ i for i in lst if isinstance(i, t) ]
     if no_open:
         print(f"{'*'*70}\n*{'Errors'.center(68)}*\n{'*'*70}\n")
-        for sub in set(i.__class__ for i in no_open):
+        for sub in {i.__class__ for i in no_open}:
             print_each(sub.kind(), sub_list(no_open, sub))
         print(f"\n{'*'*70}\n*{'Done'.center(68)}*\n{'*'*70}\n")
-    for sub in set(i.__class__ for i in to_open):
+    for sub in {i.__class__ for i in to_open}:
         open_each(sub.kind(), sub_list(to_open, sub))
     return True
 

@@ -11,7 +11,7 @@ def split_on_num(x: str, only_positive: bool=True) -> Tuple[str, float, str]:
     the last number as a float, and the remaining string
     """
     pattern: str = r"(?r)\d*\.?\d+" if only_positive else r"(?r)-?\d*\.?\d+"
-    search: Optional[regex._regex.Match] = regex.search(pattern, x)
+    search: Optional[regex.Match] = regex.search(pattern, x)
     if search is None:
         raise ValueError(f"There is no number in {x}")
     num: str = search.group()

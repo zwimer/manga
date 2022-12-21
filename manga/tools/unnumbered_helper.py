@@ -32,7 +32,7 @@ def read_dir(directory: Path) -> Dict[str, str]:
     Ignores .swp files but whines about them
     """
     assert directory.is_dir(), f"{directory} is a file"
-    files: Tuple[Path] = lsf(directory)
+    files: Tuple[Path, ...] = lsf(directory)
     ret: Dict[str, str] = {}
     for f in files:
         fname: str = f.name

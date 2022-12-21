@@ -10,7 +10,7 @@ __all__ = ("extract_url_from_contents", "extract_url",)
 def _half(what: str, where: str) -> Tuple[str, str]:
     ret: List[str] = what.split(where)
     assert len(ret) == 2, f"{what} does not contain {where} exactly once"
-    return tuple(ret)
+    return ret[0], ret[1]
 
 
 def extract_url_from_contents(data: str, extension: str) -> str:

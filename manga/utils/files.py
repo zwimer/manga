@@ -5,7 +5,7 @@ from pathlib import Path
 __all__ = ("lsf", "mv")
 
 
-def lsf(d: Path) -> Tuple[Path]:
+def lsf(d: Path) -> Tuple[Path, ...]:
     """
     ls all files in d recursively, but ignore likely undesired files
     """
