@@ -28,6 +28,7 @@ class Tested:
     """
     has_new: Set[str] = field(default_factory=set)
     ignore: Set[str] = field(default_factory=set)
+    skip: Set[str] = field(default_factory=set)
     failed: Set[str] = field(default_factory=set)
     unknown: Set[str] = field(default_factory=set)
 
@@ -96,13 +97,16 @@ def handle_results(urls: Set[str], tested: Tested) -> None:
     if len(tested.failed) > 0:
         print("The following domains could not be opened:")
         print("\t" + "\n\t".join(sorted(tested.failed)))
+    if len(tested.skip) > 0:
+        print("The following domains were skipped:")
+        print("\t" + "\n\t".join(sorted(tested.skip)))
     all_tested = set().union(*astuple(tested))
     if len(all_tested) != len(urls):
         print("The following domains were not tested:")
         print("\t" + "\n\t".join(sorted(urls - all_tested)))
         print("Assuming all remaining URLs must be opened...")
     print("Opening manga...")
-    for url in tqdm.tqdm(urls - tested.ignore):
+    for url in tqdm.tqdm(urls - tested.ignore - tested.skip):
         subprocess.check_call(["open", url], stdout=subprocess.DEVNULL,)
         time.sleep(.2)  # Rate limit
 
@@ -128,11 +132,11 @@ def open_new(directory: Path, skip: Union[Set[str], List[str]]) -> bool:
         with ThreadHandler(max_workers=32) as executor: # No DOS-ing
             signal.signal(signal.SIGINT, mk_open_remaining(executor, urls, results))
             for i in urls:
-                if sites.get_domain(i) not in skip:
-                    executor.add(evaluate, i, results, pbar)
-                else:
-                    results.ignore.add(i)
+                if sites.get_domain(i) in skip:
+                    results.skip.add(i)
                     pbar.update()
+                else:
+                    executor.add(evaluate, i, results, pbar)
     signal.signal(signal.SIGINT, original_sigint_handler)
     # Open links
     handle_results(urls, results)
