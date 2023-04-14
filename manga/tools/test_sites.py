@@ -121,7 +121,7 @@ def _test(left: str, right: str, x: float) -> bool:
 
 
 # pylint: disable=too-many-return-statements,too-many-branches
-def _evaluate(url: str) -> Optional[Failed]:
+def _evaluate(url: str, delay: int) -> Optional[Failed]:
     """
     If url is broken, return a failure class for it
     """
@@ -153,16 +153,16 @@ def _evaluate(url: str) -> Optional[Failed]:
     except requests.exceptions.RequestException as e:
         return BadRequest(url, e)
     finally:
-        time.sleep(1)  # No DOS-ing
+        time.sleep(delay)  # No DOS-ing
 
 
-def evaluate(url: str, ret: List, pbar) -> None:
+def evaluate(url: str, delay: int, ret: List, pbar) -> None:
     """
     Determine if url is broken
     Store return value in ret because we the return value will be ignored
     """
     try:
-        rv: Optional[Failed] = _evaluate(url)
+        rv: Optional[Failed] = _evaluate(url, delay)
         if rv is not None:
             ret.append(rv)
     except:
@@ -192,12 +192,14 @@ def open_each(prefix: str, lst: List[Failed]) -> None:
         print("")
 
 
-def test_sites(directory: Path) -> bool:
+def test_sites(directory: Path, n_workers: int, delay: int) -> bool:
     """
     Test each file in directory, print the results open them as needed
     """
     print("Checking arguments...")
     directory = directory.resolve()
+    assert delay >= 0, "Delay may not be negative"
+    assert n_workers > 0, "n_workers must be positive"
     assert directory.exists(), f"{directory} does not exist"
     assert directory.is_dir(), f"{directory} is not a directory"
     # Determine which requests must be made
@@ -205,11 +207,11 @@ def test_sites(directory: Path) -> bool:
     urls: Set[str] = { extract_url(i) for i in lsf(directory) }
     # Determine what to open
     tested: List[Failed] = []
-    print(f"Testing {len(urls)} urls...")
+    print(f"Testing {len(urls)} urls using {n_workers} workers...")
     with tqdm(total=len(urls)) as pbar:
-        with ThreadHandler(max_workers=16) as executor: # No DOS-ing
+        with ThreadHandler(max_workers=n_workers) as executor: # No DOS-ing
             for i in urls:
-                executor.add(evaluate, i, tested, pbar)
+                executor.add(evaluate, i, delay, tested, pbar)
     # Results
     no_open: List[Failed] = [ i for i in tested if isinstance(i, NoOpen) ]
     to_open: List[Failed] = [ i for i in tested if isinstance(i, ToOpen) ]
@@ -230,6 +232,8 @@ def main(prog: str, *args: str) -> bool:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
     parser = argparse.ArgumentParser(prog=os.path.basename(prog))
     parser.add_argument("directory", type=Path, help="The directory to test")
+    parser.add_argument("--n_workers", default=16, type=int, help="The number of sites to test concurrently")
+    parser.add_argument("--delay", default=1, type=int, help="The number of seconds each thread should wait between testing sites (to avoid DOSing)")
     return test_sites(**vars(parser.parse_args(args)))
 
 
