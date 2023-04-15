@@ -181,18 +181,18 @@ def print_each(prefix: str, lst: List[Failed]):
         print(f"{prefix}\n\t" + "\n\t".join(str(i) for i in lst))
 
 
-def open_each(prefix: str, lst: List[Failed]) -> None:
+def open_each(opener: str, prefix: str, lst: List[Failed]) -> None:
     """
     Open every item in lst
     """
     if lst:
         print(f"{prefix}\n\t" + "\n\t".join(i.url for i in lst))
         for i in tqdm(lst, leave=False):
-            subprocess.check_call(["open", i.url], stdout=subprocess.DEVNULL,)
+            subprocess.check_call([opener, i.url], stdout=subprocess.DEVNULL,)
         print("")
 
 
-def test_sites(directory: Path, n_workers: int, delay: int) -> bool:
+def test_sites(directory: Path, opener: str, prompt: bool, n_workers: int, delay: int) -> bool:
     """
     Test each file in directory, print the results open them as needed
     """
@@ -223,8 +223,11 @@ def test_sites(directory: Path, n_workers: int, delay: int) -> bool:
         for sub in {i.__class__ for i in no_open}:
             print_each(sub.kind(), sub_list(no_open, sub))
         print(f"\n{'*'*70}\n*{'Done'.center(68)}*\n{'*'*70}\n")
+    # Open
+    if prompt:
+        _ = input("Testing complete. Hit enter to open websites.")
     for sub in {i.__class__ for i in to_open}:
-        open_each(sub.kind(), sub_list(to_open, sub))
+        open_each(opener, sub.kind(), sub_list(to_open, sub))
     return True
 
 
@@ -233,6 +236,8 @@ def main(prog: str, *args: str) -> bool:
     parser = argparse.ArgumentParser(prog=os.path.basename(prog))
     parser.add_argument("directory", type=Path, help="The directory to test")
     parser.add_argument("--n_workers", default=16, type=int, help="The number of sites to test concurrently")
+    parser.add_argument("--opener", default="open", help="The default binary to open a URL with")
+    parser.add_argument("--prompt", action="store_true", help="Do not auto open sites when complete, prompt user instead")
     parser.add_argument("--delay", default=1, type=int, help="The number of seconds each thread should wait between testing sites (to avoid DOSing)")
     return test_sites(**vars(parser.parse_args(args)))
 
