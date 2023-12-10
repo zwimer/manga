@@ -1,16 +1,17 @@
-from typing import Iterable, Tuple, Set
+from __future__ import annotations
+from typing import Iterable
 from pathlib import Path
 
 
 __all__ = ("lsf", "mv")
 
 
-def lsf(d: Path) -> Tuple[Path, ...]:
+def lsf(d: Path) -> tuple[Path, ...]:
     """
     ls all files in d recursively, but ignore likely undesired files
     """
     each: Iterable[Path] = (i.resolve() for i in d.resolve().rglob("*"))
-    ignore: Set[str] = { ".DS_Store" }
+    ignore: set[str] = { ".DS_Store" }
     return tuple(i for i in each if i.is_file() and i.name not in ignore)
 
 

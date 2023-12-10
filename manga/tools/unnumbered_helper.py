@@ -1,11 +1,10 @@
-from typing import Optional, Tuple, Dict, List
+from __future__ import annotations
 from pathlib import Path
 import collections
 import argparse
 import platform
 import time
 import sys
-import os
 
 import osascript
 
@@ -26,14 +25,14 @@ def scrub(url: str) -> str:
     return url
 
 
-def read_dir(directory: Path) -> Dict[str, str]:
+def read_dir(directory: Path) -> dict[str, str]:
     """
     Read a directory and map the scrubbed URLs to their chapter numbers a strings
     Ignores .swp files but whines about them
     """
     assert directory.is_dir(), f"{directory} is a file"
-    files: Tuple[Path, ...] = lsf(directory)
-    ret: Dict[str, str] = {}
+    files: tuple[Path, ...] = lsf(directory)
+    ret: dict[str, str] = {}
     for f in files:
         fname: str = f.name
         if fname.startswith(".") and f.suffix == ".swp":
@@ -54,16 +53,16 @@ def get_url() -> str:
     return out
 
 
-def unnumbered_helper(dirs: List[Path]) -> None:
+def unnumbered_helper(dirs: list[Path]) -> None:
     """
     Print out the number of the chapter associated
     with the manga displayed in the frontmost Chrome tab
     """
     for i in dirs:
         assert i.exists(), f"{i} does not exist"
-    raw_data: List[Dict[str, str]] = [ read_dir(i) for i in dirs ]
-    data: Dict[str, str] = dict(collections.ChainMap(*raw_data))
-    old: Optional[str] = None
+    raw_data: list[dict[str, str]] = [ read_dir(i) for i in dirs ]
+    data: dict[str, str] = dict(collections.ChainMap(*raw_data))
+    old: str | None = None
     while True:
         time.sleep(.05)
         url: str = scrub(get_url())
@@ -78,7 +77,7 @@ def unnumbered_helper(dirs: List[Path]) -> None:
 
 def main(prog: str, *argv: str) -> bool:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
-    parser = argparse.ArgumentParser(prog=os.path.basename(prog))
+    parser = argparse.ArgumentParser(prog=Path(prog).name)
     parser.add_argument("dirs", type=Path, nargs="+", help="The unnumbered directories")
     try:
         unnumbered_helper(**vars(parser.parse_args(argv)))

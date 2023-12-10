@@ -1,6 +1,6 @@
-import concurrent.futures
-from concurrent.futures.thread import ThreadPoolExecutor
-from typing import Optional, Callable, List, Type, Set, Any
+from __future__ import annotations
+from concurrent.futures import Future, thread
+from typing import Callable, Any
 from functools import lru_cache
 from pathlib import Path
 import subprocess
@@ -9,7 +9,6 @@ import argparse
 import platform
 import time
 import sys
-import os
 
 from tqdm import tqdm
 import requests
@@ -18,10 +17,10 @@ from manga.utils import extract_url, lsf, split_on_num
 from manga import sites
 
 
-class ThreadHandler(ThreadPoolExecutor):
+class ThreadHandler(thread.ThreadPoolExecutor):
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self.futures: List[concurrent.futures.Future] = []
+        self.futures: list[Future] = []
     def add(self, fn: Callable[..., Any], *args: Any, **kwargs: Any) -> None:
         self.futures.append(super().submit(fn, *args, **kwargs))
     def kill(self):
@@ -121,7 +120,7 @@ def _test(left: str, right: str, x: float) -> bool:
 
 
 # pylint: disable=too-many-return-statements,too-many-branches
-def _evaluate(url: str, delay: int) -> Optional[Failed]:
+def _evaluate(url: str, delay: int) -> Failed | None:
     """
     If url is broken, return a failure class for it
     """
@@ -156,13 +155,13 @@ def _evaluate(url: str, delay: int) -> Optional[Failed]:
         time.sleep(delay)  # No DOS-ing
 
 
-def evaluate(url: str, delay: int, ret: List, pbar) -> None:
+def evaluate(url: str, delay: int, ret: list, pbar) -> None:
     """
     Determine if url is broken
     Store return value in ret because we the return value will be ignored
     """
     try:
-        rv: Optional[Failed] = _evaluate(url, delay)
+        rv: Failed | None = _evaluate(url, delay)
         if rv is not None:
             ret.append(rv)
     except:
@@ -172,7 +171,7 @@ def evaluate(url: str, delay: int, ret: List, pbar) -> None:
         pbar.update()
 
 
-def print_each(prefix: str, lst: List[Failed]):
+def print_each(prefix: str, lst: list[Failed]):
     """
     Print every item in lst
     """
@@ -181,7 +180,7 @@ def print_each(prefix: str, lst: List[Failed]):
         print(f"{prefix}\n\t" + "\n\t".join(str(i) for i in lst))
 
 
-def open_each(opener: str, prefix: str, lst: List[Failed]) -> None:
+def open_each(opener: str, prefix: str, lst: list[Failed]) -> None:
     """
     Open every item in lst
     """
@@ -204,19 +203,19 @@ def test_sites(directory: Path, opener: str, prompt: bool, n_workers: int, delay
     assert directory.is_dir(), f"{directory} is not a directory"
     # Determine which requests must be made
     print("Scanning files...")
-    urls: Set[str] = { extract_url(i) for i in lsf(directory) }
+    urls: set[str] = { extract_url(i) for i in lsf(directory) }
     # Determine what to open
-    tested: List[Failed] = []
+    tested: list[Failed] = []
     print(f"Testing {len(urls)} urls using {n_workers} workers...")
     with tqdm(total=len(urls)) as pbar:
         with ThreadHandler(max_workers=n_workers) as executor: # No DOS-ing
             for i in urls:
                 executor.add(evaluate, i, delay, tested, pbar)
     # Results
-    no_open: List[Failed] = [ i for i in tested if isinstance(i, NoOpen) ]
-    to_open: List[Failed] = [ i for i in tested if isinstance(i, ToOpen) ]
+    no_open: list[Failed] = [ i for i in tested if isinstance(i, NoOpen) ]
+    to_open: list[Failed] = [ i for i in tested if isinstance(i, ToOpen) ]
     # Print no-open failures
-    sub_list: Callable[[List[Failed], Type], List[Failed]] = \
+    sub_list: Callable[[list[Failed], type], list[Failed]] = \
         lambda lst, t: [ i for i in lst if isinstance(i, t) ]
     if no_open:
         print(f"{'*'*70}\n*{'Errors'.center(68)}*\n{'*'*70}\n")
@@ -233,7 +232,7 @@ def test_sites(directory: Path, opener: str, prompt: bool, n_workers: int, delay
 
 def main(prog: str, *args: str) -> bool:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
-    parser = argparse.ArgumentParser(prog=os.path.basename(prog))
+    parser = argparse.ArgumentParser(prog=Path(prog).name)
     parser.add_argument("directory", type=Path, help="The directory to test")
     parser.add_argument("--n_workers", default=16, type=int, help="The number of sites to test concurrently")
     parser.add_argument("--opener", default="open", help="The default binary to open a URL with")

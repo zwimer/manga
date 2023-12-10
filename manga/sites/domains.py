@@ -2,7 +2,8 @@
 The functions in this file return true if a chapter is found for the specific site
 They take in as input the html of the webpage
 """
-from typing import Callable, Dict
+from __future__ import annotations
+from typing import Callable
 
 
 __all__ = ("domains",)
@@ -67,7 +68,7 @@ def mangaclash_com(data: str) -> bool:
 #
 
 
-domains: Dict[str, Callable[[str], bool]] = {
+domains: dict[str, Callable[[str], bool]] = {
     "mangatx.com" : mangatx_com,
     "mangaclash.com" : mangaclash_com,
     "mangabuddy.com" : mangabuddy_com,

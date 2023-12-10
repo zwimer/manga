@@ -1,7 +1,6 @@
 from pathlib import Path
 import argparse
 import sys
-import os
 
 from manga.utils import split_on_num, mv
 
@@ -36,7 +35,7 @@ def up_number(file: Path, number: int, yes: bool) -> bool:
 
 
 def main(prog: str, *args: str) -> bool:
-    parser = argparse.ArgumentParser(prog=os.path.basename(prog))
+    parser = argparse.ArgumentParser(prog=Path(prog).name)
     parser.add_argument("-y", "--yes", action="store_true",
         help="Automatically accept changes; will never prompt the user")
     parser.add_argument("file", type=Path, help="The file to increase the number of")

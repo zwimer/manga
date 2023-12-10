@@ -1,13 +1,12 @@
-from typing import Dict, List
+from __future__ import annotations
 from pathlib import Path
 import argparse
 import sys
-import os
 
 from manga.utils import mv
 
 
-swap: Dict[str, str] = {
+swap: dict[str, str] = {
     "￣" : "",
     "∇" : "",
     "ゞ" : "",
@@ -32,21 +31,21 @@ def replace_unicode(x: str) -> str:
     return x
 
 
-def no_unicode(paths: List[Path], dryrun: bool) -> bool:
+def no_unicode(paths: list[Path], dryrun: bool) -> bool:
     """
     Remove unicode in each path's name
     """
     for path in paths:
         path = path.absolute()
         assert path.exists(), f"{path} does not exist"
-        new: Path = (path.parent / replace_unicode(path.name))
+        new: Path = path.parent / replace_unicode(path.name)
         if path != new:
             mv(path, new, dryrun=dryrun)
     return True
 
 
 def main(argv) -> bool:
-    parser = argparse.ArgumentParser(prog=os.path.basename(argv[0]))
+    parser = argparse.ArgumentParser(prog=Path(argv[0]).name)
     parser.add_argument("-M", "--dryrun", action="store_true", default=False)
     parser.add_argument("paths", type=Path, nargs="+")
     return no_unicode(**vars(parser.parse_args(argv)))

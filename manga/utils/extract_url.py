@@ -1,14 +1,12 @@
-#!/usr/bin/env python3
-
-from typing import Tuple, List
+from __future__ import annotations
 from pathlib import Path
 
 
 __all__ = ("extract_url_from_contents", "extract_url",)
 
 
-def _half(what: str, where: str) -> Tuple[str, str]:
-    ret: List[str] = what.split(where)
+def _half(what: str, where: str) -> tuple[str, str]:
+    ret: list[str] = what.split(where)
     assert len(ret) == 2, f"{what} does not contain {where} exactly once"
     return ret[0], ret[1]
 

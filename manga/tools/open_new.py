@@ -1,10 +1,10 @@
-from concurrent.futures.thread import ThreadPoolExecutor
-from concurrent.futures import Future
-from typing import Callable, Union, List, Set, Any
+from __future__ import annotations
+from dataclasses import dataclass, astuple, field
+from concurrent.futures import Future, thread
+from typing import Callable, Any
 from pathlib import Path
 import subprocess
 import argparse
-from dataclasses import dataclass, astuple, field
 import platform
 import signal
 import time
@@ -26,11 +26,11 @@ class Tested:
     """
     The results of testing every URL
     """
-    has_new: Set[str] = field(default_factory=set)
-    ignore: Set[str] = field(default_factory=set)
-    skip: Set[str] = field(default_factory=set)
-    failed: Set[str] = field(default_factory=set)
-    unknown: Set[str] = field(default_factory=set)
+    has_new: set[str] = field(default_factory=set)
+    ignore: set[str] = field(default_factory=set)
+    skip: set[str] = field(default_factory=set)
+    failed: set[str] = field(default_factory=set)
+    unknown: set[str] = field(default_factory=set)
 
 
 
@@ -39,10 +39,10 @@ class Tested:
 ######################################################################
 
 
-class ThreadHandler(ThreadPoolExecutor):
+class ThreadHandler(thread.ThreadPoolExecutor):
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self.futures: List[Future] = []
+        self.futures: list[Future] = []
     def add(self, fn, *args: Any, **kwargs: Any) -> None:
         self.futures.append(super().submit(fn, *args, **kwargs))
     def kill(self):
@@ -87,7 +87,7 @@ def evaluate(url: str, tested: Tested, pbar: tqdm.std.tqdm) -> None:
         pbar.update()
 
 
-def handle_results(urls: Set[str], tested: Tested) -> None:
+def handle_results(urls: set[str], tested: Tested) -> None:
     """
     Print out the test results and open each of the given URLs that should not be ignored
     """
@@ -111,7 +111,7 @@ def handle_results(urls: Set[str], tested: Tested) -> None:
         time.sleep(.2)  # Rate limit
 
 
-def open_new(directory: Path, skip: Union[Set[str], List[str]]) -> bool:
+def open_new(directory: Path, skip: set[str] | list[str]) -> bool:
     """
     Open each file in directory that has a new chapter ready
     """
@@ -123,7 +123,7 @@ def open_new(directory: Path, skip: Union[Set[str], List[str]]) -> bool:
     assert directory.is_dir(), f"{directory} is not a directory"
     # Determine which requests must be made
     print("Scanning files...")
-    urls: Set[str] = { extract_url(i) for i in lsf(directory) }
+    urls: set[str] = { extract_url(i) for i in lsf(directory) }
     results = Tested()
     # Determine what to open
     print(f"Making at most {len(urls)} requests...")
@@ -145,7 +145,7 @@ def open_new(directory: Path, skip: Union[Set[str], List[str]]) -> bool:
 
 def main(prog: str, *args: str) -> bool:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
-    parser = argparse.ArgumentParser(prog=os.path.basename(prog))
+    parser = argparse.ArgumentParser(prog=Path(prog).name)
     parser.add_argument("--skip", type=str, nargs="+", default=[], help="Domains to skip")
     parser.add_argument("directory", type=Path, help="The directory to open new items from")
     return open_new(**vars(parser.parse_args(args)))

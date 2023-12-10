@@ -1,3 +1,49 @@
 [build-system]
-requires = ["setuptools>=46.4.0"]
+requires = ["setuptools>=61.2"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "manga_scrape"
+description = "A python package used for automating finding manga chapters"
+license = {text = "GPL-3.0"}
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+urls = {Homepage = "https://github.com/zwimer/manga"}
+requires-python = ">=3.8"
+dependencies = [
+    "osascript",
+    "regex",
+    "requests",
+    "tldextract",
+    "tqdm",
+]
+dynamic = ["version"]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.scripts]
+guess = "manga.tools.guess:cli"
+inc-chapter = "manga.tools.inc_chapter:cli"
+open-new = "manga.tools.open_new:cli"
+test-sites = "manga.tools.test_sites:cli"
+unnumbered-helper = "manga.tools.unnumbered_helper:cli"
+up-number = "manga.tools.up_number:cli"
+no-unicode = "manga.tools.no_unicode:cli"
+
+[tool.setuptools]
+license-files = ["LICENSE"]
+include-package-data = false
+
+[tool.setuptools.packages]
+find = {namespaces = false}
+
+[tool.setuptools.package-data]
+manga_scrape = ["py.typed"]
+
+[tool.setuptools.dynamic]
+version = {attr = "manga.__version__"}

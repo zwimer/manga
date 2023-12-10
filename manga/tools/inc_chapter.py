@@ -1,8 +1,7 @@
-from typing import Tuple, List
+from __future__ import annotations
 from pathlib import Path
 import argparse
 import sys
-import os
 
 from manga.utils import extract_url_from_contents, split_on_num, mv
 
@@ -17,13 +16,13 @@ def inc_str(x: str) -> str:
     return left + new + right
 
 
-def find_url(data: str, ext: str) -> Tuple[str, str, str]:
+def find_url(data: str, ext: str) -> tuple[str, str, str]:
     """
     Split data into by the found URL
     Return the data on the left, the URL, and the data on the right
     """
     url: str = extract_url_from_contents(data, ext)
-    sides: List[str] = data.split(url) + [""]
+    sides: list[str] = data.split(url) + [""]
     assert len(sides) <= 3, "URL repeated in data"
     return sides[0], url, sides[1]
 
@@ -71,7 +70,7 @@ def inc_chapter(file: Path, url_only: bool, yes: bool, dryrun: bool) -> bool:
 
 
 def main(prog: str, *args: str) -> bool:
-    parser = argparse.ArgumentParser(prog=os.path.basename(prog))
+    parser = argparse.ArgumentParser(prog=Path(prog).name)
     parser.add_argument("-y", "--yes", action="store_true",
         help="Automatically accept changes; will never prompt the user")
     parser.add_argument("-n", "--dryrun", action="store_true",

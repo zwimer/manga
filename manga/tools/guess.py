@@ -1,11 +1,11 @@
-from typing import Sequence, Optional, Callable, Union, Tuple, Dict, List, Any
+from __future__ import annotations
+from typing import Sequence, Callable, Any
 from pathlib import Path
 import collections
 import platform
 import argparse
 import sys
 import re
-import os
 
 from manga.utils import split_on_num, extract_url, lsf, mv
 
@@ -22,18 +22,18 @@ max_chapter: int = 2500  # Higher has an increased chance of error
 ######################################################################
 
 
-def read_dir(d: Path, *, remove_numbers: bool = False) -> Dict[str, Path]:
+def read_dir(d: Path, *, remove_numbers: bool = False) -> dict[str, Path]:
     """
     Read the files in a directory
     Return a dict mapping the scrubbed URLs they contain to the files within
     Fails if two files contain the same URLs after scrubbing
     """
-    files: Tuple[Path, ...] = lsf(d)
-    scrub_to_file: Dict[str, List[Path]] = collections.defaultdict(list)
+    files: tuple[Path, ...] = lsf(d)
+    scrub_to_file: dict[str, list[Path]] = collections.defaultdict(list)
     for f in files:
         scb: str = scrub(extract_url(f), remove_numbers=remove_numbers)
         scrub_to_file[scb].append(f)
-    duplicates: List[Tuple[str, List[Path]]] = [
+    duplicates: list[tuple[str, list[Path]]] = [
         (i,k) for i,k in scrub_to_file.items() if len(k) != 1
     ]
     if len(duplicates) > 0:
@@ -59,7 +59,7 @@ def remove_unwanted_periods(x: str) -> str:
     Numbers are assumed to start and end with a digit, not a decimal point
     """
     for offset, pat in enumerate((r"\.[^\d]", r"[^\d]\.")):
-        res: Optional[re.Match] = re.compile(pat).search(x)
+        res: re.Match | None = re.compile(pat).search(x)
         if res is not None:
             idx: int = offset + x.find(res.group())
             x = x[:idx] + x[idx+1:]
@@ -99,7 +99,7 @@ def scrub(x: str, *, remove_numbers: bool = False) -> str:
     return x.strip()
 
 
-def diff_helper(a: str, b: str) -> Tuple[str, str]:
+def diff_helper(a: str, b: str) -> tuple[str, str]:
     """
     Return the substrings of a and b whose first character
     is the first character that differs between a and b
@@ -127,7 +127,7 @@ def are_same(guessing: str, compare_to: str) -> bool:
     weird: bool
     try:
         guessing_ch = float(a[::-1])
-        weird = (guessing_ch > max_chapter)
+        weird = guessing_ch > max_chapter
         if len(b):
             compare_to_ch = float(b[::-1])
             weird &= (compare_to_ch > max_chapter or guessing_ch > compare_to_ch)
@@ -139,7 +139,7 @@ def are_same(guessing: str, compare_to: str) -> bool:
     return "y" == input()
 
 
-def choose(x: Any, near: Sequence[Any]) -> Union[Any, None]:
+def choose(x: Any, near: Sequence[Any]) -> Any | None:
     """
     Prompt the user to select the nearest element in near to x
     If near only has one option, that choice is selected automatically
@@ -182,7 +182,7 @@ def disp_warning(x: str) -> None:
 
 
 #pylint: disable=too-many-locals
-def guess_single(raw: Path, data: Dict[str, Path], yes: bool, force: bool, dryrun: bool) -> bool:
+def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryrun: bool) -> bool:
     """
     Try to replace the file in old for the same manga with raw, editing the title as needed
     Return true on success
@@ -190,11 +190,11 @@ def guess_single(raw: Path, data: Dict[str, Path], yes: bool, force: bool, dryru
     # Link match
     raw_data: str = extract_url(raw)
     scrubbed_data: str = scrub(raw_data)
-    options: List[str] = [ i for i in data.keys() if are_same(scrubbed_data, i) ]
+    options: list[str] = [ i for i in data.keys() if are_same(scrubbed_data, i) ]
     assert len(options) > 0, "Link matching failed"
     if len(options) > 1 and yes:
         raise RuntimeError("User input requires but --yes given, failing")
-    choice: Optional[str] = choose(scrubbed_data, options)
+    choice: str | None = choose(scrubbed_data, options)
     if choice is None:
         return False
     old: Path = data[choice]
@@ -254,7 +254,7 @@ def guess_single(raw: Path, data: Dict[str, Path], yes: bool, force: bool, dryru
 ######################################################################
 
 
-def guess(directory: Path, files: List[Path], yes: bool, force: bool, dryrun: bool) -> bool:
+def guess(directory: Path, files: list[Path], yes: bool, force: bool, dryrun: bool) -> bool:
     """
     Try to update each file in directory corresponding to a file to guess
     If yes, auto accepts proposed update; if force, ignores safety requirements
@@ -273,8 +273,8 @@ def guess(directory: Path, files: List[Path], yes: bool, force: bool, dryrun: bo
     if not dryrun:
         trash.mkdir(exist_ok=True)
     # For each file, try to guess
-    data: Dict[str, Path] = read_dir(directory)
-    fails: List[Path] = []
+    data: dict[str, Path] = read_dir(directory)
+    fails: list[Path] = []
     for f in files:
         try:
             assert guess_single(f, data, yes, force, dryrun), \
@@ -295,7 +295,7 @@ def guess(directory: Path, files: List[Path], yes: bool, force: bool, dryrun: bo
 
 def main(prog: str, *args: str) -> bool:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
-    parser = argparse.ArgumentParser(prog=os.path.basename(prog))
+    parser = argparse.ArgumentParser(prog=Path(prog).name)
     parser.add_argument("-f", "--force", action="store_true", help="Override safety checks")
     parser.add_argument("-y", "--yes", action="store_true", help="Automatically accept changes; will never prompt the user")
     parser.add_argument("-n", "--dryrun", action="store_true", help="Do not actually change anything")
