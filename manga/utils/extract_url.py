@@ -2,7 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 
 
-__all__ = ("extract_url_from_contents", "extract_url",)
+__all__ = ("extract_url_from_contents", "extract_url")
 
 
 def _half(what: str, where: str) -> tuple[str, str]:
@@ -18,7 +18,7 @@ def extract_url_from_contents(data: str, extension: str) -> str:
     upper: str
     lower: str
     if ".url" == extension:
-        upper = _half(data, 'URL=')[1]
+        upper = _half(data, "URL=")[1]
     elif ".desktop" == extension:
         lower = _half(data, "URL=")[1]
         upper = _half(lower, "Icon=")[0]
@@ -38,7 +38,7 @@ def extract_url(file: Path):
     """
     file = file.resolve()
     assert file.exists(), f"{file} does not exist"
-    assert file.suffix , f"{file} has no extension"
+    assert file.suffix, f"{file} has no extension"
     with file.open("r") as f:
         try:
             data = f.read()

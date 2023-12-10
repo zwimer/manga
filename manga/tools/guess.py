@@ -33,17 +33,12 @@ def read_dir(d: Path, *, remove_numbers: bool = False) -> dict[str, Path]:
     for f in files:
         scb: str = scrub(extract_url(f), remove_numbers=remove_numbers)
         scrub_to_file[scb].append(f)
-    duplicates: list[tuple[str, list[Path]]] = [
-        (i,k) for i,k in scrub_to_file.items() if len(k) != 1
-    ]
+    duplicates: list[tuple[str, list[Path]]] = [(i, k) for i, k in scrub_to_file.items() if len(k) != 1]
     if len(duplicates) > 0:
         disp_warning(f"Warning: duplicated files in: {d}")
         print("\nIgnoring the following sets of files:")
-        print(",\n".join(
-            (i + ": {\n\t" + ",\n\t".join(str(j) for j in k) + "\n")
-            for i,k in duplicates
-        ))
-    return { i:k[0] for i,k in scrub_to_file.items() if len(k) == 1 }
+        print(",\n".join((i + ": {\n\t" + ",\n\t".join(str(j) for j in k) + "\n") for i, k in duplicates))
+    return {i: k[0] for i, k in scrub_to_file.items() if len(k) == 1}
 
 
 ######################################################################
@@ -62,7 +57,7 @@ def remove_unwanted_periods(x: str) -> str:
         res: re.Match | None = re.compile(pat).search(x)
         if res is not None:
             idx: int = offset + x.find(res.group())
-            x = x[:idx] + x[idx+1:]
+            x = x[:idx] + x[idx + 1 :]
             return remove_unwanted_periods(x)
     while len(x) and x[0] == ".":
         x = x[1:]
@@ -130,7 +125,7 @@ def are_same(guessing: str, compare_to: str) -> bool:
         weird = guessing_ch > max_chapter
         if len(b):
             compare_to_ch = float(b[::-1])
-            weird &= (compare_to_ch > max_chapter or guessing_ch > compare_to_ch)
+            weird &= compare_to_ch > max_chapter or guessing_ch > compare_to_ch
     except ValueError:  # The float conversion failed, links did not match
         return False
     if not weird:
@@ -149,7 +144,7 @@ def choose(x: Any, near: Sequence[Any]) -> Any | None:
         return near[0]
     print(f"What is nearest to: {x}")
     st: Callable[[int], str] = lambda x: f"{x}.".ljust(3) + " "
-    for i,k in enumerate(near):
+    for i, k in enumerate(near):
         print(f"\t{st(i)}{k}")
     print(f"\t{st(len(near))}None of the above")
     try:
@@ -176,12 +171,12 @@ def disp_warning(x: str) -> None:
     warn: str = " WARNING "
     delim: str = "*" * max(18, round((8 + len(x) - len(warn)) / 2))
     boarder: str = delim + warn + delim
-    blank: str = "*" + " "*(len(boarder) - 2) + "*"
+    blank: str = "*" + " " * (len(boarder) - 2) + "*"
     middle: str = "*" + x.center(len(boarder) - 2) + "*"
     print("\n".join((boarder, blank, middle, blank, boarder)))
 
 
-#pylint: disable=too-many-locals
+# pylint: disable=too-many-locals
 def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryrun: bool) -> bool:
     """
     Try to replace the file in old for the same manga with raw, editing the title as needed
@@ -190,7 +185,7 @@ def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryru
     # Link match
     raw_data: str = extract_url(raw)
     scrubbed_data: str = scrub(raw_data)
-    options: list[str] = [ i for i in data.keys() if are_same(scrubbed_data, i) ]
+    options: list[str] = [i for i in data.keys() if are_same(scrubbed_data, i)]
     assert len(options) > 0, "Link matching failed"
     if len(options) > 1 and yes:
         raise RuntimeError("User input requires but --yes given, failing")
@@ -201,15 +196,16 @@ def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryru
 
     # Extract chapter numbers
     old_data: str = extract_url(old)
-    _, old_n, _, = split_on_num(old_data)
-    _, new_n, _, = split_on_num(raw_data) # new chapter is raw's chapter
+    _, old_n, _ = split_on_num(old_data)
+    _, new_n, _ = split_on_num(raw_data)  # new chapter is raw's chapter
 
     # Construct new file's name
     old_base: str = old.name
     assert any(c.isdigit() for c in old_base), f"{old} has no chapter number in its name"
     left, _, right = split_on_num(old_base)
-    assert right.startswith(".") and right.count(".") == 1, \
-        f"{old_base} should have a file extension with a single period in it right after the chapter number"
+    assert (
+        right.startswith(".") and right.count(".") == 1
+    ), f"{old_base} should have a file extension with a single period in it right after the chapter number"
     new_base: str = left + str(int(new_n) if new_n == int(new_n) else new_n) + raw.suffix
 
     # Determine danger level
@@ -266,7 +262,7 @@ def guess(directory: Path, files: list[Path], yes: bool, force: bool, dryrun: bo
     assert directory.is_dir(), f"{directory} is not a directory"
     for i in files:
         assert not i.is_symlink(), f"{directory} may not contain links"
-    files = [ i.resolve() for i in files ]
+    files = [i.resolve() for i in files]
     for i in files:
         assert i.is_file(), f"Will not guess non-file: {i}"
     # Make trash directory
@@ -277,8 +273,7 @@ def guess(directory: Path, files: list[Path], yes: bool, force: bool, dryrun: bo
     fails: list[Path] = []
     for f in files:
         try:
-            assert guess_single(f, data, yes, force, dryrun), \
-                f"Failed to guess {f} for directory {directory}"
+            assert guess_single(f, data, yes, force, dryrun), f"Failed to guess {f} for directory {directory}"
             print(f"\n{'-'*70}\n")
         except AssertionError as e:
             print(f"Failed for: {f}\n\t- {e}\n")
@@ -297,11 +292,17 @@ def main(prog: str, *args: str) -> bool:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
     parser = argparse.ArgumentParser(prog=Path(prog).name)
     parser.add_argument("-f", "--force", action="store_true", help="Override safety checks")
-    parser.add_argument("-y", "--yes", action="store_true",
-        help="Automatically accept changes; will never prompt the user")
+    parser.add_argument(
+        "-y", "--yes", action="store_true", help="Automatically accept changes; will never prompt the user"
+    )
     parser.add_argument("-n", "--dryrun", action="store_true", help="Do not actually change anything")
-    parser.add_argument("-d", "--directory", type=Path, required=True,
-        help="The files in this directory will be what the input files are compared against")
+    parser.add_argument(
+        "-d",
+        "--directory",
+        type=Path,
+        required=True,
+        help="The files in this directory will be what the input files are compared against",
+    )
     parser.add_argument("files", type=Path, nargs="+", help="The files to guess")
     ns = parser.parse_args(args)
     if ns.force and not ns.yes:

@@ -21,12 +21,15 @@ class ThreadHandler(thread.ThreadPoolExecutor):
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.futures: list[Future] = []
+
     def add(self, fn: Callable[..., Any], *args: Any, **kwargs: Any) -> None:
         self.futures.append(super().submit(fn, *args, **kwargs))
+
     def kill(self):
         self.shutdown(wait=False)
         for i in self.futures:
             i.cancel()
+
 
 #
 # Failure Classes
@@ -34,64 +37,83 @@ class ThreadHandler(thread.ThreadPoolExecutor):
 
 
 class Failed:
-    reason: str = "" # Set by subclasses
-    _unique_reason: bool = False # Overridden by subclasses if desired
+    reason: str = ""  # Set by subclasses
+    _unique_reason: bool = False  # Overridden by subclasses if desired
+
     def __init__(self, url: str):
         self.url: str = url
+
     def __str__(self):
         if self._unique_reason:
             return f"{self.reason}: {self.url}"
         return self.url
+
     def __repr__(self):
         ret = f"<{self.__class__.__name__}: url='{self.url}'"
         if self._unique_reason:
             ret += f", reason='{self.reason}'"
         return ret + ">"
+
     @classmethod
     def kind(cls):
         if cls._unique_reason:
             return cls.__name__
         return f"{cls.__name__}: {cls.reason}"
 
+
 # Should not happen
+
 
 class NoOpen(Failed):
     pass
 
+
 class Unknown(NoOpen):
     reason = "This website is for an unknown / unsupported domain."
 
+
 class BadRequest(NoOpen):
     _unique_reason = True
+
     def __init__(self, url: str, reason):
         super().__init__(url)
         self.reason = f"A request failed: {reason}"
 
+
 class MalformedURL(NoOpen):
     pass
+
 
 class NotInt(MalformedURL):
     reason = "The URL's chapter is not an integer."
 
+
 class HasVol(MalformedURL):
     reason = "The URL contains 'vol'; this is a bad sign"
+
 
 class Pattern(MalformedURL):
     reason = "The URL contains a pattern that is dangerous"
 
+
 # Non-Malformed URL Failure Classes
+
 
 class ToOpen(Failed):
     pass
 
+
 class Tiny(ToOpen):
     reason = "URL failed by default, it is too small"
+
 
 class Exists(ToOpen):
     reason = "The URL is valid, but this site seems to be missing other chapters"
 
+
 class Missing(ToOpen):
     reason = "Previous and future chapters exist, this one does not."
+
 
 class Broken(ToOpen):
     reason = "This website does not seem to have any chapters of this manga."
@@ -135,17 +157,17 @@ def _evaluate(url: str, delay: int) -> Failed | None:
         return Pattern(url)
     test = lambda x: _test(left, right, x)
     try:
-        if test(n) and not test(n-1) and not test(5):
+        if test(n) and not test(n - 1) and not test(5):
             return Exists(url)
-        time.sleep(.25)  # No DOS-ing
+        time.sleep(0.25)  # No DOS-ing
         if not test(n):
-            for i in (.1, 1, 1.1, 2, 2.1, 5, 10, 20):
-                if test(n+i):
+            for i in (0.1, 1, 1.1, 2, 2.1, 5, 10, 20):
+                if test(n + i):
                     return Missing(url)
-        time.sleep(.5)  # No DOS-ing
-        if not any(test(i) for i in (n, n-1, 5, n+.1, n+1, n+1.1,)):
+        time.sleep(0.5)  # No DOS-ing
+        if not any(test(i) for i in (n, n - 1, 5, n + 0.1, n + 1, n + 1.1)):
             return Broken(url)
-        time.sleep(.25)  # No DOS-ing
+        time.sleep(0.25)  # No DOS-ing
         return None
     except sites.UnknownDomain:
         return Unknown(url)
@@ -187,7 +209,7 @@ def open_each(opener: str, prefix: str, lst: list[Failed]) -> None:
     if lst:
         print(f"{prefix}\n\t" + "\n\t".join(i.url for i in lst))
         for i in tqdm(lst, leave=False):
-            subprocess.check_call([opener, i.url], stdout=subprocess.DEVNULL,)
+            subprocess.check_call([opener, i.url], stdout=subprocess.DEVNULL)
         print("")
 
 
@@ -203,20 +225,19 @@ def test_sites(directory: Path, opener: str, prompt: bool, n_workers: int, delay
     assert directory.is_dir(), f"{directory} is not a directory"
     # Determine which requests must be made
     print("Scanning files...")
-    urls: set[str] = { extract_url(i) for i in lsf(directory) }
+    urls: set[str] = {extract_url(i) for i in lsf(directory)}
     # Determine what to open
     tested: list[Failed] = []
     print(f"Testing {len(urls)} urls using {n_workers} workers...")
     with tqdm(total=len(urls)) as pbar:
-        with ThreadHandler(max_workers=n_workers) as executor: # No DOS-ing
+        with ThreadHandler(max_workers=n_workers) as executor:  # No DOS-ing
             for i in urls:
                 executor.add(evaluate, i, delay, tested, pbar)
     # Results
-    no_open: list[Failed] = [ i for i in tested if isinstance(i, NoOpen) ]
-    to_open: list[Failed] = [ i for i in tested if isinstance(i, ToOpen) ]
+    no_open: list[Failed] = [i for i in tested if isinstance(i, NoOpen)]
+    to_open: list[Failed] = [i for i in tested if isinstance(i, ToOpen)]
     # Print no-open failures
-    sub_list: Callable[[list[Failed], type], list[Failed]] = \
-        lambda lst, t: [ i for i in lst if isinstance(i, t) ]
+    sub_list: Callable[[list[Failed], type], list[Failed]] = lambda lst, t: [i for i in lst if isinstance(i, t)]
     if no_open:
         print(f"{'*'*70}\n*{'Errors'.center(68)}*\n{'*'*70}\n")
         for sub in {i.__class__ for i in no_open}:
@@ -236,10 +257,15 @@ def main(prog: str, *args: str) -> bool:
     parser.add_argument("directory", type=Path, help="The directory to test")
     parser.add_argument("--n_workers", default=16, type=int, help="The number of sites to test concurrently")
     parser.add_argument("--opener", default="open", help="The default binary to open a URL with")
-    parser.add_argument("--prompt", action="store_true",
-        help="Do not auto open sites when complete, prompt user instead")
-    parser.add_argument("--delay", default=1, type=int,
-        help="The number of seconds each thread should wait between testing sites (to avoid DOSing)")
+    parser.add_argument(
+        "--prompt", action="store_true", help="Do not auto open sites when complete, prompt user instead"
+    )
+    parser.add_argument(
+        "--delay",
+        default=1,
+        type=int,
+        help="The number of seconds each thread should wait between testing sites (to avoid DOSing)",
+    )
     return test_sites(**vars(parser.parse_args(args)))
 
 

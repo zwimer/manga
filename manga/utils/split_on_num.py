@@ -2,7 +2,7 @@ from __future__ import annotations
 import regex
 
 
-def split_on_num(x: str, only_positive: bool=True) -> tuple[str, float, str]:
+def split_on_num(x: str, only_positive: bool = True) -> tuple[str, float, str]:
     """
     Split x at the number greater than one
     This assumes numbers end in a digit, not a decimal point

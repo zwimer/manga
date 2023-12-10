@@ -60,11 +60,11 @@ def unnumbered_helper(dirs: list[Path]) -> None:
     """
     for i in dirs:
         assert i.exists(), f"{i} does not exist"
-    raw_data: list[dict[str, str]] = [ read_dir(i) for i in dirs ]
+    raw_data: list[dict[str, str]] = [read_dir(i) for i in dirs]
     data: dict[str, str] = dict(collections.ChainMap(*raw_data))
     old: str | None = None
     while True:
-        time.sleep(.05)
+        time.sleep(0.05)
         url: str = scrub(get_url())
         if url == old:
             continue

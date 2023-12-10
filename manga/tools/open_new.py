@@ -26,12 +26,12 @@ class Tested:
     """
     The results of testing every URL
     """
+
     has_new: set[str] = field(default_factory=set)
     ignore: set[str] = field(default_factory=set)
     skip: set[str] = field(default_factory=set)
     failed: set[str] = field(default_factory=set)
     unknown: set[str] = field(default_factory=set)
-
 
 
 ######################################################################
@@ -43,8 +43,10 @@ class ThreadHandler(thread.ThreadPoolExecutor):
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.futures: list[Future] = []
+
     def add(self, fn, *args: Any, **kwargs: Any) -> None:
         self.futures.append(super().submit(fn, *args, **kwargs))
+
     def kill(self):
         self.shutdown(wait=False)
         for i in self.futures:
@@ -55,6 +57,7 @@ def mk_open_remaining(executor, urls, tested) -> Callable[[int, Any], None]:
     """
     Return a signal handler to open the remaining tested URLs
     """
+
     def handler(_: int, _2: Any) -> None:
         global mk_open_remaining_first  # pylint: disable=global-statement
         if not mk_open_remaining_first:
@@ -64,6 +67,7 @@ def mk_open_remaining(executor, urls, tested) -> Callable[[int, Any], None]:
         executor.kill()
         handle_results(urls, tested)
         os._exit(0)  # pylint: disable=protected-access
+
     return handler
 
 
@@ -107,8 +111,8 @@ def handle_results(urls: set[str], tested: Tested) -> None:
         print("Assuming all remaining URLs must be opened...")
     print("Opening manga...")
     for url in tqdm.tqdm(urls - tested.ignore - tested.skip):
-        subprocess.check_call(["open", url], stdout=subprocess.DEVNULL,)
-        time.sleep(.2)  # Rate limit
+        subprocess.check_call(["open", url], stdout=subprocess.DEVNULL)
+        time.sleep(0.2)  # Rate limit
 
 
 def open_new(directory: Path, skip: set[str] | list[str]) -> bool:
@@ -123,13 +127,13 @@ def open_new(directory: Path, skip: set[str] | list[str]) -> bool:
     assert directory.is_dir(), f"{directory} is not a directory"
     # Determine which requests must be made
     print("Scanning files...")
-    urls: set[str] = { extract_url(i) for i in lsf(directory) }
+    urls: set[str] = {extract_url(i) for i in lsf(directory)}
     results = Tested()
     # Determine what to open
     print(f"Making at most {len(urls)} requests...")
     original_sigint_handler: Any = signal.getsignal(signal.SIGINT)
     with tqdm.tqdm(total=len(urls)) as pbar:
-        with ThreadHandler(max_workers=32) as executor: # No DOS-ing
+        with ThreadHandler(max_workers=32) as executor:  # No DOS-ing
             signal.signal(signal.SIGINT, mk_open_remaining(executor, urls, results))
             for i in urls:
                 if sites.get_domain(i) in skip:

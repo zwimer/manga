@@ -25,7 +25,7 @@ def test(url: str, timeout: int = 15) -> bool:
     except KeyError:
         raise UnknownDomain(url)  # pylint: disable=raise-missing-from
     session = requests.Session()
-    session.headers.update({
-        "User-Agent": "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4"
-    })
+    session.headers.update(
+        {"User-Agent": "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4"}
+    )
     return fn(session.get(url, timeout=timeout).text)

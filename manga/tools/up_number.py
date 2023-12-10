@@ -36,8 +36,9 @@ def up_number(file: Path, number: int, yes: bool) -> bool:
 
 def main(prog: str, *args: str) -> bool:
     parser = argparse.ArgumentParser(prog=Path(prog).name)
-    parser.add_argument("-y", "--yes", action="store_true",
-        help="Automatically accept changes; will never prompt the user")
+    parser.add_argument(
+        "-y", "--yes", action="store_true", help="Automatically accept changes; will never prompt the user"
+    )
     parser.add_argument("file", type=Path, help="The file to increase the number of")
     parser.add_argument("number", type=float, help="The number to increment file to")
     return up_number(**vars(parser.parse_args(args)))
