@@ -297,7 +297,8 @@ def main(prog: str, *args: str) -> bool:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
     parser = argparse.ArgumentParser(prog=Path(prog).name)
     parser.add_argument("-f", "--force", action="store_true", help="Override safety checks")
-    parser.add_argument("-y", "--yes", action="store_true", help="Automatically accept changes; will never prompt the user")
+    parser.add_argument("-y", "--yes", action="store_true",
+        help="Automatically accept changes; will never prompt the user")
     parser.add_argument("-n", "--dryrun", action="store_true", help="Do not actually change anything")
     parser.add_argument("-d", "--directory", type=Path, required=True,
         help="The files in this directory will be what the input files are compared against")

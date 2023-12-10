@@ -236,8 +236,10 @@ def main(prog: str, *args: str) -> bool:
     parser.add_argument("directory", type=Path, help="The directory to test")
     parser.add_argument("--n_workers", default=16, type=int, help="The number of sites to test concurrently")
     parser.add_argument("--opener", default="open", help="The default binary to open a URL with")
-    parser.add_argument("--prompt", action="store_true", help="Do not auto open sites when complete, prompt user instead")
-    parser.add_argument("--delay", default=1, type=int, help="The number of seconds each thread should wait between testing sites (to avoid DOSing)")
+    parser.add_argument("--prompt", action="store_true",
+        help="Do not auto open sites when complete, prompt user instead")
+    parser.add_argument("--delay", default=1, type=int,
+        help="The number of seconds each thread should wait between testing sites (to avoid DOSing)")
     return test_sites(**vars(parser.parse_args(args)))
 
 
