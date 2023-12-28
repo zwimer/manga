@@ -68,6 +68,10 @@ def mangakakalot_today(data: str) -> bool:
     )
 
 
+def chapmanganato_to(data: str) -> bool:
+    return "404 NOT FOUND" not in data and "LOAD ALL" in data
+
+
 def chapmanganato_com(data: str) -> bool:
     return "404 NOT FOUND" not in data and "LOAD ALL" in data
 
@@ -106,4 +110,5 @@ domains: dict[str, Callable[[str], bool]] = {
     #
     "readmanganato.com": chapmanganato_com,
     "chapmanganato.com": chapmanganato_com,
+    "chapmanganato.to": chapmanganato_to,
 }
