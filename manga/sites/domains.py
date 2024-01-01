@@ -81,8 +81,12 @@ def mangaclash_com(data: str) -> bool:
     return "cursorNext" in data and "Alternative" not in data
 
 
-def zinmanga_com(data: str) -> bool:
+def manhuascan_com(data: str) -> bool:
     return "prev_page" in data and "Read Last" not in data
+
+
+def zinmanga_com(data: str) -> bool:
+    return "updated-date" in data and "Page Navigation" in data and "readchapterbtn" not in data
 
 
 #
@@ -113,5 +117,6 @@ domains: dict[str, Callable[[str], bool]] = {
     "chapmanganato.com": chapmanganato_com,
     "chapmanganato.to": chapmanganato_to,
     #
+    "manhuascan.com": manhuascan_com,
     "zinmanga.com": zinmanga_com,
 }
