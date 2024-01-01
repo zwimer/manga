@@ -6,9 +6,6 @@ from __future__ import annotations
 from typing import Callable
 
 
-__all__ = ("domains",)
-
-
 #
 # Return true if chapter is found
 #
@@ -84,6 +81,10 @@ def mangaclash_com(data: str) -> bool:
     return "cursorNext" in data and "Alternative" not in data
 
 
+def zinmanga_com(data: str) -> bool:
+    return "prev_page" in data and "Read Last" not in data
+
+
 #
 # Known domains
 #
@@ -111,4 +112,6 @@ domains: dict[str, Callable[[str], bool]] = {
     "readmanganato.com": chapmanganato_com,
     "chapmanganato.com": chapmanganato_com,
     "chapmanganato.to": chapmanganato_to,
+    #
+    "zinmanga.com": zinmanga_com,
 }
