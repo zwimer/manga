@@ -87,6 +87,8 @@ def evaluate(url: str, tested: Tested, pbar: tqdm.std.tqdm) -> None:
         tested.unknown.add(url)
     except requests.exceptions.RequestException:
         tested.failed.add(url)
+    except Exception as e:
+        print(f"Thread failed: {e}")
     finally:
         pbar.update()
 
