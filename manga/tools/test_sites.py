@@ -68,6 +68,10 @@ class NoOpen(Failed):
     pass
 
 
+class Skipped(NoOpen):
+    reason = "This domain was skipped"
+
+
 class Unknown(NoOpen):
     reason = "This website is for an unknown / unsupported domain."
 
@@ -208,15 +212,19 @@ def open_each(opener: str, prefix: str, lst: list[Failed]) -> None:
     """
     if lst:
         print(f"{prefix}\n\t" + "\n\t".join(i.url for i in lst))
-        for i in tqdm(lst, leave=False):
+        for i in tqdm(lst, dynamic_ncols=True, leave=False):
             subprocess.check_call([opener, i.url], stdout=subprocess.DEVNULL)
         print("")
 
 
-def test_sites(directory: Path, opener: str, prompt: bool, n_workers: int, delay: int) -> bool:
+def test_sites(
+    directory: Path, skip: set[str] | list[str], opener: str, prompt: bool, n_workers: int, delay: int
+) -> bool:
     """
     Test each file in directory, print the results open them as needed
     """
+    if isinstance(skip, list):
+        return test_sites(directory, set(skip), opener, prompt, n_workers, delay)
     print("Checking arguments...")
     directory = directory.resolve()
     assert delay >= 0, "Delay may not be negative"
@@ -229,10 +237,14 @@ def test_sites(directory: Path, opener: str, prompt: bool, n_workers: int, delay
     # Determine what to open
     tested: list[Failed] = []
     print(f"Testing {len(urls)} urls using {n_workers} workers...")
-    with tqdm(total=len(urls)) as pbar:
+    with tqdm(total=len(urls), dynamic_ncols=True) as pbar:
         with ThreadHandler(max_workers=n_workers) as executor:  # No DOS-ing
             for i in urls:
-                executor.add(evaluate, i, delay, tested, pbar)
+                if sites.get_domain(i) in skip:
+                    tested.append(Skipped(i))
+                    pbar.update()
+                else:
+                    executor.add(evaluate, i, delay, tested, pbar)
     # Results
     no_open: list[Failed] = [i for i in tested if isinstance(i, NoOpen)]
     to_open: list[Failed] = [i for i in tested if isinstance(i, ToOpen)]
@@ -255,6 +267,7 @@ def main(prog: str, *args: str) -> bool:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
     parser = argparse.ArgumentParser(prog=Path(prog).name)
     parser.add_argument("directory", type=Path, help="The directory to test")
+    parser.add_argument("--skip", type=str, nargs="+", default=[], help="Domains to skip")
     parser.add_argument("--n_workers", default=16, type=int, help="The number of sites to test concurrently")
     parser.add_argument("--opener", default="open", help="The default binary to open a URL with")
     parser.add_argument(

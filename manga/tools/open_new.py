@@ -112,7 +112,7 @@ def handle_results(urls: set[str], tested: Tested) -> None:
         print("\t" + "\n\t".join(sorted(urls - all_tested)))
         print("Assuming all remaining URLs must be opened...")
     print("Opening manga...")
-    for url in tqdm.tqdm(urls - tested.ignore - tested.skip):
+    for url in tqdm.tqdm(urls - tested.ignore - tested.skip, dynamic_ncols=True):
         subprocess.check_call(["open", url], stdout=subprocess.DEVNULL)
         time.sleep(0.2)  # Rate limit
 
@@ -134,7 +134,7 @@ def open_new(directory: Path, skip: set[str] | list[str]) -> bool:
     # Determine what to open
     print(f"Making at most {len(urls)} requests...")
     original_sigint_handler: Any = signal.getsignal(signal.SIGINT)
-    with tqdm.tqdm(total=len(urls)) as pbar:
+    with tqdm.tqdm(total=len(urls), dynamic_ncols=True) as pbar:
         with ThreadHandler(max_workers=32) as executor:  # No DOS-ing
             signal.signal(signal.SIGINT, mk_open_remaining(executor, urls, results))
             for i in urls:

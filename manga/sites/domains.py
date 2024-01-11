@@ -89,6 +89,10 @@ def manhuaus_org(data: str) -> bool:
     return "prev_page" in data and "main-menu" not in data
 
 
+def manhwatop_com(data: str) -> bool:
+    return "loader.svg" in data and "Show more" not in data
+
+
 def zinmanga_com(data: str) -> bool:
     return "single-chapter-select" in data and "TRENDING" not in data
 
@@ -123,5 +127,6 @@ domains: dict[str, Callable[[str], bool]] = {
     #
     "manhuascan.com": manhuascan_com,
     "manhuaus.org": manhuaus_org,
+    "manhwatop.com": manhwatop_com,
     "zinmanga.com": zinmanga_com,
 }
