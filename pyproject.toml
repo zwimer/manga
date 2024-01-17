@@ -9,10 +9,10 @@ license = {text = "GPL-3.0"}
 classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.10",
 ]
 urls = {Homepage = "https://github.com/zwimer/manga"}
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 dependencies = [
     "osascript",
     "regex",
@@ -52,7 +52,7 @@ version = {attr = "manga.__version__"}
 
 [tool.black]
 line-length = 120
-target-version = ["py38"]
+target-version = ["py310"]
 
 [tool.ruff]
 ignore=["E731"]
