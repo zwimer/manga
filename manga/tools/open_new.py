@@ -1,8 +1,9 @@
 from __future__ import annotations
 from dataclasses import dataclass, astuple, field
 from concurrent.futures import Future, thread
-from typing import Callable, Any
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 import subprocess
 import argparse
 import platform

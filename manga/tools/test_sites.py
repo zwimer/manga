@@ -1,8 +1,9 @@
 from __future__ import annotations
 from concurrent.futures import Future, thread
-from typing import Callable, Any
+from collections.abc import Callable
 from functools import lru_cache
 from pathlib import Path
+from typing import Any
 import subprocess
 import traceback
 import argparse

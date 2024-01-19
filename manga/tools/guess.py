@@ -1,6 +1,7 @@
 from __future__ import annotations
-from typing import Sequence, Callable, Any
+from collections.abc import Sequence, Callable
 from pathlib import Path
+from typing import Any
 import collections
 import platform
 import argparse
