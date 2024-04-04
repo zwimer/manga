@@ -1,21 +1,27 @@
 from __future__ import annotations
 from concurrent.futures import Future, thread
-from collections.abc import Callable
+from collections import defaultdict
+from typing import TYPE_CHECKING
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
 import subprocess
 import traceback
 import argparse
 import platform
+import termios
 import time
 import sys
 
+from rich.progress import Progress, BarColumn, TextColumn, TimeRemainingColumn, MofNCompleteColumn, TaskProgressColumn
 from tqdm import tqdm
 import requests
 
 from manga.utils import extract_url, lsf, split_on_num
 from manga import sites
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from typing import Any
 
 
 class ThreadHandler(thread.ThreadPoolExecutor):
@@ -131,7 +137,7 @@ class Broken(ToOpen):
 
 @lru_cache(maxsize=None)
 def _test_site(url: str):
-    return sites.test(url)
+    return sites.test(url, timeout_retries=5)
 
 
 def _test(left: str, right: str, x: float) -> bool:
@@ -147,7 +153,7 @@ def _test(left: str, right: str, x: float) -> bool:
 
 
 # pylint: disable=too-many-return-statements,too-many-branches
-def _evaluate(url: str, delay: int) -> Failed | None:
+def _evaluate(url: str) -> Failed | None:
     """
     If url is broken, return a failure class for it
     """
@@ -164,38 +170,46 @@ def _evaluate(url: str, delay: int) -> Failed | None:
     try:
         if test(n) and not test(n - 1) and not test(5):
             return Exists(url)
-        time.sleep(0.25)  # No DOS-ing
+        time.sleep(0.05)  # No DOS-ing
         if not test(n):
             for i in (0.1, 1, 1.1, 2, 2.1, 5, 10, 20):
                 if test(n + i):
                     return Missing(url)
-        time.sleep(0.5)  # No DOS-ing
+        time.sleep(0.1)  # No DOS-ing
         if not any(test(i) for i in (n, n - 1, 5, n + 0.1, n + 1, n + 1.1)):
             return Broken(url)
-        time.sleep(0.25)  # No DOS-ing
+        time.sleep(0.05)  # No DOS-ing
         return None
     except sites.UnknownDomain:
         return Unknown(url)
     except requests.exceptions.RequestException as e:
+        print(e)
         return BadRequest(url, e)
-    finally:
-        time.sleep(delay)  # No DOS-ing
 
 
-def evaluate(url: str, delay: int, ret: list, pbar) -> None:
+def evaluate(urls: str, delay: int, ret: list, pbar: Progress) -> None:
     """
     Determine if url is broken
     Store return value in ret because we the return value will be ignored
     """
     try:
-        rv: Failed | None = _evaluate(url, delay)
-        if rv is not None:
-            ret.append(rv)
+        domain = sites.get_domain(urls[0])
+        task = pbar.add_task(f"{domain}:", total=len(urls))
+        update = lambda: pbar.update(task, advance=1)
+        first: bool = False
+        for i in urls:
+            if not first:
+                time.sleep(delay)
+                first = False
+            rv: Failed | None = _evaluate(i)
+            if rv is not None:
+                ret.append(rv)
+            update()
+    except KeyboardInterrupt:
+        raise
     except:
         traceback.print_exc()
         raise
-    finally:
-        pbar.update()
 
 
 def print_each(prefix: str, lst: list[Failed]):
@@ -218,34 +232,46 @@ def open_each(opener: str, prefix: str, lst: list[Failed]) -> None:
         print("")
 
 
-def test_sites(
-    directory: Path, skip: set[str] | list[str], opener: str, prompt: bool, n_workers: int, delay: int
-) -> bool:
+def test_sites(directory: Path, skip: set[str] | list[str], opener: str, no_prompt: bool, delay: int) -> bool:
     """
     Test each file in directory, print the results open them as needed
     """
     if isinstance(skip, list):
-        return test_sites(directory, set(skip), opener, prompt, n_workers, delay)
+        return test_sites(directory, set(skip), opener, no_prompt, delay)
     print("Checking arguments...")
     directory = directory.resolve()
     assert delay >= 0, "Delay may not be negative"
-    assert n_workers > 0, "n_workers must be positive"
     assert directory.exists(), f"{directory} does not exist"
     assert directory.is_dir(), f"{directory} is not a directory"
     # Determine which requests must be made
     print("Scanning files...")
     urls: set[str] = {extract_url(i) for i in lsf(directory)}
+    # Bucket URLs
+    bucketed = defaultdict(list)
+    for i in urls:
+        bucketed[sites.get_domain(i)].append(i)
     # Determine what to open
     tested: list[Failed] = []
-    print(f"Testing {len(urls)} urls using {n_workers} workers...")
-    with tqdm(total=len(urls), dynamic_ncols=True) as pbar:
-        with ThreadHandler(max_workers=n_workers) as executor:  # No DOS-ing
-            for i in urls:
-                if sites.get_domain(i) in skip:
+    print(f"Testing {len(urls)} urls...")
+    with Progress(
+        TextColumn("[progress.description]{task.description}"),
+        TaskProgressColumn(),
+        BarColumn(None),
+        MofNCompleteColumn(),
+        TimeRemainingColumn(compact=True, elapsed_when_finished=True),
+        transient=True,
+        expand=True,
+    ) as pbar:
+        for i in skip:
+            got: list | None = bucketed.pop(i, None)
+            if got is not None:
+                pbar.add_task(i, total=len(got))
+                for i in got:
                     tested.append(Skipped(i))
-                    pbar.update()
-                else:
-                    executor.add(evaluate, i, delay, tested, pbar)
+                pbar.update(i, advance=len(got))
+        with ThreadHandler(max_workers=len(bucketed)) as executor:  # No DOS-ing
+            for k in bucketed.values():
+                executor.add(evaluate, k, delay, tested, pbar)
     # Results
     no_open: list[Failed] = [i for i in tested if isinstance(i, NoOpen)]
     to_open: list[Failed] = [i for i in tested if isinstance(i, ToOpen)]
@@ -257,10 +283,12 @@ def test_sites(
             print_each(sub.kind(), sub_list(no_open, sub))
         print(f"\n{'*'*70}\n*{'Done'.center(68)}*\n{'*'*70}\n")
     # Open
-    if prompt:
+    if not no_prompt:
+        termios.tcflush(sys.stdin, termios.TCIFLUSH)
         _ = input("Testing complete. Hit enter to open websites.")
     for sub in {i.__class__ for i in to_open}:
         open_each(opener, sub.kind(), sub_list(to_open, sub))
+    print("Done!")
     return True
 
 
@@ -269,14 +297,11 @@ def main(prog: str, *args: str) -> bool:
     parser = argparse.ArgumentParser(prog=Path(prog).name)
     parser.add_argument("directory", type=Path, help="The directory to test")
     parser.add_argument("--skip", type=str, nargs="+", default=[], help="Domains to skip")
-    parser.add_argument("--n_workers", default=16, type=int, help="The number of sites to test concurrently")
     parser.add_argument("--opener", default="open", help="The default binary to open a URL with")
-    parser.add_argument(
-        "--prompt", action="store_true", help="Do not auto open sites when complete, prompt user instead"
-    )
+    parser.add_argument("--no-prompt", action="store_true", help="Auto open sites when complete, do not prompt user")
     parser.add_argument(
         "--delay",
-        default=1,
+        default=0,
         type=int,
         help="The number of seconds each thread should wait between testing sites (to avoid DOSing)",
     )
