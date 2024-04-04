@@ -86,6 +86,14 @@ def manhuascan_com(data: str) -> bool:
     return "loadchapter" in data and "chapterNumber = null" not in data
 
 
+def manhuafast_com(data: str) -> bool:
+    return "backInfoPage" in data and "Read Last" not in data
+
+
+def manhuafast_net(data: str) -> bool:
+    return "prev_page" in data and "Read Last" not in data
+
+
 def manhuaus_org(data: str) -> bool:
     return "prev_page" in data and "main-menu" not in data
 
@@ -127,6 +135,8 @@ domains: dict[str, Callable[[str], bool]] = {
     "chapmanganato.to": chapmanganato_to,
     #
     "manhuascan.com": manhuascan_com,
+    "manhuafast.com": manhuafast_com,
+    "manhuafast.net": manhuafast_net,
     "manhuaus.org": manhuaus_org,
     "manhwatop.com": manhwatop_com,
     "zinmanga.com": zinmanga_com,
