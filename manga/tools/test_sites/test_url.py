@@ -14,7 +14,7 @@ _success = Success()
 
 @cache
 def _test_site(url: str) -> bool:
-    return sites.test(url, timeout_retries=5)
+    return sites.test(url, timeout_retries=8)
 
 
 def _test(left: str, right: str, x: float) -> bool:
