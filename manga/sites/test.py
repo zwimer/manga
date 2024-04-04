@@ -28,7 +28,7 @@ def get_domain(url: str) -> str:
     return f"{info.domain}.{info.suffix}"
 
 
-def _test(url: str, fn: Callable[[str], bool], timeout: int, timeout_retries: int, delay: int) -> bool:
+def _test(url: str, fn: Callable[[str], bool], timeout: int, timeout_retries: int, delay: float) -> bool:
     """
     Return true if the given chapter is found
     If a timeout occurs, retries at most timeout_retries times; sleeps in between
@@ -43,7 +43,7 @@ def _test(url: str, fn: Callable[[str], bool], timeout: int, timeout_retries: in
     if delay > 60:
         print(f"ReadTimeout for: {url}: Sleeping for {delay} seconds then trying again")
     sleep(delay)
-    return _test(url, fn, timeout, timeout_retries - 1, min(delay * 2, 960))
+    return _test(url, fn, timeout, timeout_retries - 1, min(delay * 2, 960.0))
 
 
 def test(url: str, timeout: int = 15, timeout_retries: int = 0) -> bool:
@@ -56,4 +56,4 @@ def test(url: str, timeout: int = 15, timeout_retries: int = 0) -> bool:
         fn: Callable[[str], bool] = domains[domain]
     except KeyError:
         raise UnknownDomain(url)  # pylint: disable=raise-missing-from
-    return _test(url, fn, timeout, timeout_retries, 15)
+    return _test(url, fn, timeout, timeout_retries, 7.5)
