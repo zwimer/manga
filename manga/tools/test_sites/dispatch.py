@@ -39,7 +39,7 @@ def dispatch(state: State, func: FuncType, *args: Any, **kwargs: Any) -> None:
         BarColumn(None),
         MofNCompleteColumn(),
         TimeRemainingColumn(compact=True, elapsed_when_finished=True),
-        # transient=True, TODO
+        transient=True,
         expand=True,
     ) as pbar:
         with _ThreadHandler(max_workers=len(buckets)) as executor:  # No DOS-ing
