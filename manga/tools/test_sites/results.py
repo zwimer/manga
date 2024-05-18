@@ -31,7 +31,7 @@ def print_no_open_failures(state: State) -> None:
         print(f"{'*' * 70}\n*{'Done'.center(68)}*\n{'*' * 70}\n")
 
 
-def print_open_failures(state: State, no_prompt: bool, opener: str) -> None:
+def print_open_failures(state: State, no_prompt: bool, skip_tiny: bool, opener: str) -> None:
     to_open: tuple[URL, ...] = state.get(ToOpen)
     if not to_open:
         return
@@ -40,6 +40,9 @@ def print_open_failures(state: State, no_prompt: bool, opener: str) -> None:
         _ = input("Testing complete. Hit enter to open websites.")
     classes = {cast(ToOpen, i.status).__class__ for i in to_open}  # Set de-dups
     for type_ in sorted(classes, key=lambda t: _order.index(t) if t in _order else len(_order)):
+        if skip_tiny and type_ is Tiny:
+            print("Skipping tiny\n")
+            continue
         got = state.get(type_)
         print(f"{type_.kind()}\n\t" + "\n\t".join(_fmt(i) for i in got))
         for url in tqdm(got, dynamic_ncols=True, leave=False):
@@ -47,7 +50,7 @@ def print_open_failures(state: State, no_prompt: bool, opener: str) -> None:
         print("")
 
 
-def results(state: State, no_prompt: bool, opener: str) -> None:
+def results(state: State, no_prompt: bool, skip_tiny: bool, opener: str) -> None:
     print_no_open_failures(state)
-    print_open_failures(state, no_prompt, opener)
+    print_open_failures(state, no_prompt, skip_tiny, opener)
     print("Done!")

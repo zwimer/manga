@@ -11,6 +11,9 @@ def main(prog: str, *args: str) -> bool:
     parser = argparse.ArgumentParser(prog=Path(prog).name)
     parser.add_argument("directory", type=Path, help="The directory to test")
     parser.add_argument("--skip", type=str, nargs="+", default=[], help="Domains to skip")
+    parser.add_argument(
+        "--skip-tiny", action="store_true", help="Do not open sites that were not tested because of a low chapter count"
+    )
     parser.add_argument("--opener", default="open", help="The default binary to open a URL with")
     parser.add_argument("--no-prompt", action="store_true", help="Auto open sites when complete, do not prompt user")
     parser.add_argument(
