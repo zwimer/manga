@@ -110,6 +110,10 @@ def zinmanga_com(data: str) -> bool:
     return "single-chapter-select" in data and "TRENDING" not in data
 
 
+def kunmanga_com(data: str) -> bool:
+    return "chapters_selectbox_holder" in data and "LATEST MANGA RELEASES" not in data
+
+
 #
 # Known domains
 #
@@ -145,4 +149,5 @@ domains: dict[str, Callable[[str], bool]] = {
     "manhuaus.org": manhuaus_org,
     "manhwatop.com": manhwatop_com,
     "zinmanga.com": zinmanga_com,
+    "kunmanga.com": kunmanga_com,
 }
