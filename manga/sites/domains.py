@@ -110,6 +110,10 @@ def kunmanga_com(data: str) -> bool:
     return "chapters_selectbox_holder" in data and "LATEST MANGA RELEASES" not in data
 
 
+def manga4life_com(data: str) -> bool:
+    return "CurChapter" in data and "Next" in data and "mx-auto QuickSearch" not in data
+
+
 #
 # Known domains
 #
@@ -139,6 +143,7 @@ domains: dict[str, Callable[[str], bool]] = {
     "chapmanganato.com": chapmanganato_com,
     "chapmanganato.to": chapmanganato_to,
     #
+    "manga4life.com": manga4life_com,
     "manhuascan.com": manhuascan_com,
     "manhuafast.net": manhuafast_net,
     "manhuaus.org": manhuaus_org,
