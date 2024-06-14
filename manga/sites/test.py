@@ -36,7 +36,11 @@ def _test(url: str, fn: Callable[[str], bool], timeout: int, timeout_retries: in
     session = requests.Session()
     session.headers.update({"User-Agent": choice(_agents)})
     try:
-        return fn(session.get(url, timeout=timeout).text)
+        response = session.get(url, timeout=timeout)
+        if not response.ok:
+            print(f"Got {response.status_code} from GET {url}")
+            return False
+        return fn(response.text)
     except requests.exceptions.ReadTimeout:
         if timeout_retries <= 0:
             raise
