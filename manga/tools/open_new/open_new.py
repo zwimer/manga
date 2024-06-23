@@ -6,7 +6,7 @@ import os
 import requests
 import tqdm
 
-from manga.utils import extract_url, lsf
+from manga.utils import redirect_print_to_tqdm, extract_url, lsf
 from manga import sites
 
 from .thread_handler import ThreadHandler
@@ -67,13 +67,14 @@ def open_new(directory: Path, skip: set[str] | list[str]) -> bool:
     # Determine what to open
     print(f"Making at most {len(urls)} requests...")
     with tqdm.tqdm(total=len(urls), dynamic_ncols=True) as pbar:
-        with ThreadHandler(max_workers=32, sigint_handler=handler) as executor:
-            for i in urls:
-                if sites.get_domain(i) in skip:
-                    results.skip.add(i)
-                    pbar.update()
-                else:
-                    executor.add(evaluate, i, results, pbar)
+        with redirect_print_to_tqdm():
+            with ThreadHandler(max_workers=32, sigint_handler=handler) as executor:
+                for i in urls:
+                    if sites.get_domain(i) in skip:
+                        results.skip.add(i)
+                        pbar.update()
+                    else:
+                        executor.add(evaluate, i, results, pbar)
     # Open links
     handle_results(urls, results)
     return True
