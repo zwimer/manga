@@ -47,13 +47,13 @@ def test_url(url: str) -> Tested:
     try:
         if test(n) and not test(n - 1) and not test(5):
             return Exists()
-        sleep(0.05)  # No DOS-ing
+        sleep(0.04)  # No DOS-ing
         if not test(n) and any(test(n + i) for i in (0.1, 1, 1.1, 2, 2.1, 5, 10, 20)):
             return Missing()
-        sleep(0.1)  # No DOS-ing
+        sleep(0.08)  # No DOS-ing
         if not any(test(i) for i in (n, n - 1, 5, n + 0.1, n + 1, n + 1.1)):
             return Broken()
-        sleep(0.05)  # No DOS-ing
+        sleep(0.04)  # No DOS-ing
         return _success
     except sites.UnknownDomain:
         return Unknown()

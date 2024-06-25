@@ -28,29 +28,34 @@ def get_domain(url: str) -> str:
     return f"{info.domain}.{info.suffix}"
 
 
-def _test(url: str, fn: Callable[[str], bool], timeout: int, timeout_retries: int, delay: float) -> bool:
+def _test(url: str, fn: Callable[[str], bool], timeout: float, timeout_retries: int, delay: float) -> bool:
     """
     Return true if the given chapter is found
     If a timeout occurs, retries at most timeout_retries times; sleeps in between
     """
     session = requests.Session()
     session.headers.update({"User-Agent": choice(_agents)})
+    what: str
     try:
         response = session.get(url, timeout=timeout)
-        if not response.ok:
+        if response.ok:
+            return fn(response.text)
+        if response.status_code not in (429, 503):
             print(f"Got {response.status_code} from GET {url}")
             return False
-        return fn(response.text)
+        what = f"Got {response.status_code}"
     except requests.exceptions.ReadTimeout:
-        if timeout_retries <= 0:
-            raise
+        what = "ReadTimeout"
+    # Timeout or too many requests error at this point
+    if timeout_retries <= 0:
+        raise
     if delay > 60:
-        print(f"ReadTimeout for: {url}: Sleeping for {delay} seconds then trying again")
+        print(f"{what} for: {url}: Sleeping for {delay} seconds then trying again")
     sleep(delay)
     return _test(url, fn, timeout, timeout_retries - 1, min(delay * 2, 960.0))
 
 
-def test(url: str, timeout: int = 15, timeout_retries: int = 0, base_delay: float = 7.5) -> bool:
+def test(url: str, timeout: float = 7.5, timeout_retries: int = 0, base_delay: float = 7.5) -> bool:
     """
     Return true if the given chapter is found
     If a timeout occurs, retries at most timeout_retries times; sleeps in between
