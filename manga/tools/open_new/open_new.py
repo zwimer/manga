@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
+from signal import Signals
 from pathlib import Path
 import os
 
@@ -54,7 +55,7 @@ def open_new(directory: Path, skip: set[str] | list[str]) -> bool:
     results = Tested()
 
     # Sigint handler
-    def handler(executor: ThreadHandler, *_: Any) -> None:
+    def sigint_handler(executor: ThreadHandler, *_: Any) -> None:
         global mk_open_remaining_first  # pylint: disable=global-statement
         if not mk_open_remaining_first:
             os._exit(1)  # pylint: disable=protected-access
@@ -64,11 +65,22 @@ def open_new(directory: Path, skip: set[str] | list[str]) -> bool:
         handle_results(urls, results)
         os._exit(0)  # pylint: disable=protected-access
 
+    # Siginfo handler
+    def siginfo_handler(executor: ThreadHandler, *_: Any) -> None:
+        untested: set[str] = urls - results.tested
+        if not untested:
+            return
+        print("Stil untested:")
+        for i in untested:
+            print(i)
+
     # Determine what to open
     print(f"Making at most {len(urls)} requests...")
     with tqdm.tqdm(total=len(urls), dynamic_ncols=True) as pbar:
         with redirect_print_to_tqdm():
-            with ThreadHandler(max_workers=32, sigint_handler=handler) as executor:
+            with ThreadHandler(
+                max_workers=32, handlers={Signals.SIGINT: sigint_handler, Signals.SIGINFO: siginfo_handler}
+            ) as executor:
                 for i in urls:
                     if sites.get_domain(i) in skip:
                         results.skip.add(i)

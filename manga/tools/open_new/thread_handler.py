@@ -8,16 +8,22 @@ if TYPE_CHECKING:
     from typing import Any
 
 
-class _SigintHandler(Protocol):
+class _SignalHandler(Protocol):
     def __call__(self, executor: ThreadHandler, *args: Any):
         pass
 
 
 class ThreadHandler(thread.ThreadPoolExecutor):
-    def __init__(self, sigint_handler: _SigintHandler, *args: Any, **kwargs: Any):
-        self._handler = lambda *x: sigint_handler(self, *x)
+    def __init__(self, handlers: dict[signal.Signals, _SignalHandler], *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
+        self._handlers = dict(handlers)
         self.futures: list[Future] = []
+
+    def _install_handler(self, s: signal.Signals, f: _SignalHandler) -> Any:
+        def ret(*x):
+            return f(self, *x)
+
+        return signal.signal(s, ret)
 
     def add(self, fn, *args: Any, **kwargs: Any) -> None:
         self.futures.append(super().submit(fn, *args, **kwargs))
@@ -28,11 +34,12 @@ class ThreadHandler(thread.ThreadPoolExecutor):
             i.cancel()
 
     def __enter__(self) -> ThreadHandler:
-        self._orig: Any = signal.signal(signal.SIGINT, self._handler)
+        self._orig: dict[signal.Signals, Any] = {s: self._install_handler(s, f) for s, f in self._handlers.items()}
         rv = super().__enter__()
         assert rv is self
         return self
 
     def __exit__(self, *args):
         super().__exit__(*args)
-        signal.signal(signal.SIGINT, self._orig)
+        for s, f in self._orig.items():
+            signal.signal(s, f)
