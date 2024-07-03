@@ -70,7 +70,7 @@ def open_new(directory: Path, skip: set[str] | list[str]) -> bool:
         untested: set[str] = urls - results.tested
         if not untested:
             return
-        print("Stil untested:")
+        print("Still untested:")
         for i in untested:
             print(i)
 
