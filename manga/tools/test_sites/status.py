@@ -95,3 +95,7 @@ class Missing(ToOpen):
 
 class Broken(ToOpen):
     reason = "This website does not seem to have any chapters of this manga."
+
+
+class PointFive(ToOpen):
+    reason = "There exists a .5 release before the current chapter"

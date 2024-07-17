@@ -6,7 +6,20 @@ import requests
 from manga.utils import split_on_num
 from manga import sites
 
-from .status import Success, Tested, HasVol, NotInt, Tiny, Pattern, Exists, Missing, Broken, Unknown, BadRequest
+from .status import (
+    Success,
+    Tested,
+    HasVol,
+    NotInt,
+    Tiny,
+    Pattern,
+    Exists,
+    Missing,
+    Broken,
+    Unknown,
+    BadRequest,
+    PointFive,
+)
 
 
 _success = Success()
@@ -48,10 +61,14 @@ def test_url(url: str) -> Tested:
         if test(n) and not test(n - 1) and not test(5):
             return Exists()
         sleep(0.04)  # No DOS-ing
-        if not test(n) and any(test(n + i) for i in (0.1, 1, 1.1, 2, 2.1, 5, 10, 20)):
-            return Missing()
-        sleep(0.08)  # No DOS-ing
-        if not any(test(i) for i in (n, n - 1, 5, n + 0.1, n + 1, n + 1.1)):
+        if not test(n):
+            if any(test(n + i) for i in (0.1, 0.5, 1, 1.1, 2, 2.1, 5, 10, 20)):
+                return Missing()
+            sleep(0.08)  # No DOS-ing
+            if test(n - 0.5):
+                return PointFive()
+        sleep(0.01)  # No DOS-ing
+        if not any(test(i) for i in (n, n - 1, 5, n + 0.1, n + 0.5, n - 0.5, n + 1, n + 1.1, n + 5)):
             return Broken()
         sleep(0.04)  # No DOS-ing
         return _success

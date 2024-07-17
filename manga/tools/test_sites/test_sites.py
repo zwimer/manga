@@ -47,13 +47,19 @@ def evaluate_urls(urls: list[URL], update_pbar: Callable[[], None], skip: set[st
 
 
 def test_sites(
-    directory: Path, skip: set[str] | list[str], opener: str, skip_tiny: bool, no_prompt: bool, delay: int
+    directory: Path,
+    skip: set[str] | list[str],
+    opener: str,
+    skip_tiny: bool,
+    skip_point_five: bool,
+    no_prompt: bool,
+    delay: int,
 ) -> bool:
     """
     Test each file in directory, print the results open them as needed
     """
     if isinstance(skip, list):
-        return test_sites(directory, set(skip), opener, skip_tiny, no_prompt, delay)
+        return test_sites(directory, set(skip), opener, skip_tiny, skip_point_five, no_prompt, delay)
     print("Checking arguments...")
     directory = directory.resolve()
     assert delay >= 0, "Delay may not be negative"
@@ -65,5 +71,5 @@ def test_sites(
     print(f"Testing {len(state)} urls...")
     dispatch(state, evaluate_urls, skip, delay)
     # Results
-    results(state, no_prompt, skip_tiny, opener)
+    results(state, no_prompt, skip_tiny, skip_point_five, opener)
     return True

@@ -14,6 +14,9 @@ def main(prog: str, *args: str) -> bool:
     parser.add_argument(
         "--skip-tiny", action="store_true", help="Do not open sites that were not tested because of a low chapter count"
     )
+    parser.add_argument(
+        "--skip-point-five", action="store_true", help="Do not open sites have a .5 chapter after the latest chapter"
+    )
     parser.add_argument("--opener", default="open", help="The default binary to open a URL with")
     parser.add_argument("--no-prompt", action="store_true", help="Auto open sites when complete, do not prompt user")
     parser.add_argument(
