@@ -8,7 +8,7 @@ import sys
 
 import osascript
 
-from manga.utils import split_on_num, extract_url, lsf
+from manga.utils import split_on_num, extract_url, lsf, get_logger
 
 
 def scrub(url: str) -> str:
@@ -60,6 +60,7 @@ def unnumbered_helper(dirs: list[Path]) -> None:
     """
     for i in dirs:
         assert i.exists(), f"{i} does not exist"
+    get_logger(__name__).info("Running on dirs: %s", dirs)
     raw_data: list[dict[str, str]] = [read_dir(i) for i in dirs]
     data: dict[str, str] = dict(collections.ChainMap(*raw_data))
     old: str | None = None
