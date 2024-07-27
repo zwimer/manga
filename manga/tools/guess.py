@@ -12,8 +12,9 @@ from manga.utils import split_on_num, extract_url, lsf, mv
 
 
 # Config
-trash: Path = Path.home() / ".Trash/guess-manga/"
-max_chapter: int = 2500  # Higher has an increased chance of error
+TOLERANCE: int = 20
+TRASH: Path = Path.home() / ".Trash/guess-manga/"
+MAX_CHAPTER: int = 2500  # Higher has an increased chance of error
 
 
 ######################################################################
@@ -123,10 +124,10 @@ def are_same(guessing: str, compare_to: str) -> bool:
     weird: bool
     try:
         guessing_ch = float(a[::-1])
-        weird = guessing_ch > max_chapter
+        weird = guessing_ch > MAX_CHAPTER
         if len(b):
             compare_to_ch = float(b[::-1])
-            weird &= compare_to_ch > max_chapter or guessing_ch > compare_to_ch
+            weird &= compare_to_ch > MAX_CHAPTER or guessing_ch > compare_to_ch
     except ValueError:  # The float conversion failed, links did not match
         return False
     if not weird:
@@ -211,7 +212,7 @@ def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryru
 
     # Determine danger level
     diff: float = new_n - old_n
-    serious_warn: bool = diff <= 0 or diff > 50
+    serious_warn: bool = diff <= 0 or diff > TOLERANCE
     warn: bool = serious_warn or diff == 0 or diff > 3
 
     # Prompt user to accept unless not required
@@ -226,7 +227,7 @@ def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryru
         print("Accept? [N/?/y]")
         accept = input()
     elif force and serious_warn:
-        print("Serious warning detected, overriding force. Failing...")
+        print("Serious warning detected, overriding forced. Failing...")
         accept = "N"
     elif force or not warn:
         print("Auto accepting.")
@@ -234,7 +235,7 @@ def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryru
 
     # Act on prompt input
     if accept == "y":
-        mv(old, trash / old_base, dryrun=dryrun)
+        mv(old, TRASH / old_base, dryrun=dryrun)
         mv(raw, old.parent / new_base, dryrun=dryrun)
         return True
     elif accept == "?":
@@ -268,7 +269,7 @@ def guess(directory: Path, files: list[Path], yes: bool, force: bool, dryrun: bo
         assert i.is_file(), f"Will not guess non-file: {i}"
     # Make trash directory
     if not dryrun:
-        trash.mkdir(exist_ok=True)
+        TRASH.mkdir(exist_ok=True)
     # For each file, try to guess
     data: dict[str, Path] = read_dir(directory)
     fails: list[Path] = []
