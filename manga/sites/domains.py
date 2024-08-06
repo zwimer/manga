@@ -110,6 +110,13 @@ def manga4life_com(data: str) -> bool:
     return "CurChapter" in data and "Next" in data and "mx-auto QuickSearch" not in data
 
 
+# Special functions
+
+
+def true_(_: str) -> bool:
+    return True
+
+
 #
 # Known domains
 #
@@ -145,4 +152,8 @@ domains: dict[str, Callable[[str], bool]] = {
     "manhuaus.org": manhuaus_org,
     "zinmanga.com": zinmanga_com,
     "kunmanga.com": kunmanga_com,
+    #
+    # Returns 404 if no new chapter
+    #
+    "kingofshojo.com": true_,
 }

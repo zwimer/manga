@@ -40,6 +40,8 @@ def _test(url: str, fn: Callable[[str], bool], timeout: float, timeout_retries: 
         response = session.get(url, timeout=timeout)
         if response.ok:
             return fn(response.text)
+        if response.status_code == 404:
+            return False
         if response.status_code not in (429, 503):
             print(f"Got {response.status_code} from GET {url}")
             return False
