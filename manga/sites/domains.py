@@ -110,6 +110,10 @@ def manga4life_com(data: str) -> bool:
     return "CurChapter" in data and "Next" in data and "mx-auto QuickSearch" not in data
 
 
+def harimanga_com(data: str) -> bool:
+    return '"prev":"Prev","next":"Next' in data and "#manga-discussion" not in data
+
+
 # Special functions
 
 
@@ -149,6 +153,7 @@ domains: dict[str, Callable[[str], bool]] = {
     "manga4life.com": manga4life_com,
     "manhuascan.com": manhuascan_com,
     "manhwatop.com": manhwatop_com,
+    "harimanga.com": harimanga_com,
     "manhuaus.org": manhuaus_org,
     "zinmanga.com": zinmanga_com,
     "kunmanga.com": kunmanga_com,
