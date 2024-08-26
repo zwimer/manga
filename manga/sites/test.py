@@ -28,7 +28,7 @@ def get_domain(url: str) -> str:
     return f"{info.domain}.{info.suffix}"
 
 
-def _test(url: str, fn: Callable[[str], bool], timeout: float, timeout_retries: int, delay: float) -> bool:
+def _test(url: str, fn: Callable[[str], bool], timeout: float, timeout_retries: int, base_delay: float) -> bool:
     """
     Return true if the given chapter is found
     If a timeout occurs, retries at most timeout_retries times; sleeps in between
@@ -50,11 +50,11 @@ def _test(url: str, fn: Callable[[str], bool], timeout: float, timeout_retries: 
         what = "ReadTimeout"
     # Timeout or too many requests error at this point
     if timeout_retries <= 0:
-        raise
-    if delay > 60:
-        print(f"{what} for: {url}: Sleeping for {delay} seconds then trying again")
-    sleep(delay)
-    return _test(url, fn, timeout, timeout_retries - 1, min(delay * 2, 960.0))
+        raise RuntimeError(what)
+    if base_delay > 60:
+        print(f"{what} for: {url}: Sleeping for {base_delay} seconds then trying again")
+    sleep(base_delay)
+    return _test(url, fn, timeout, timeout_retries - 1, min(base_delay * 2, 960.0))
 
 
 def test(url: str, timeout: float = 7.5, timeout_retries: int = 0, base_delay: float = 7.5) -> bool:
