@@ -3,12 +3,22 @@ import argparse
 import platform
 import sys
 
+from manga.sites import domains
 from .test_sites import test_sites
+
+
+class Supported(argparse.Action):
+    def __call__(self, _, _2, arg, _3):
+        arg = "" if arg is None else arg
+        match = tuple(i for i in domains if arg in i)
+        print("No matches found." if len(match) == 0 else "\n".join(match))
+        sys.exit(0)
 
 
 def main(prog: str, *args: str) -> bool:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
     parser = argparse.ArgumentParser(prog=Path(prog).name)
+    parser.add_argument("--supported", action=Supported, nargs="?")
     parser.add_argument("directory", type=Path, help="The directory to test")
     parser.add_argument("--skip", type=str, nargs="+", default=[], help="Domains to skip")
     parser.add_argument(
