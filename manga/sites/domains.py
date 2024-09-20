@@ -90,6 +90,10 @@ def manhuascan_com(data: str) -> bool:
     return "loadchapter" in data and "chapterNumber = null" not in data
 
 
+def manhuaus_com(data: str) -> bool:
+    return "btn prev_page" in data and "Show more" not in data
+
+
 def manhuaus_org(data: str) -> bool:
     return "prev_page" in data and "main-menu" not in data
 
@@ -154,6 +158,7 @@ domains: dict[str, Callable[[str], bool]] = {
     "manhuascan.com": manhuascan_com,
     "manhwatop.com": manhwatop_com,
     "harimanga.com": harimanga_com,
+    "manhuaus.com": manhuaus_com,
     "manhuaus.org": manhuaus_org,
     "zinmanga.com": zinmanga_com,
     "kunmanga.com": kunmanga_com,
