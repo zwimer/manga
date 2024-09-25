@@ -38,8 +38,7 @@ def inc_chapter(file: Path, url_only: bool, yes: bool, dryrun: bool) -> bool:
     assert file.is_file(), f"{file} is not a file"
     # Pre-check + extract url
     base: str = file.name
-    with file.open("r") as f:
-        data: str = f.read()
+    data: str = file.read_text()
     left, url, right = find_url(data, file.suffix)
     # Increment required items
     new_url: str = inc_str(url)
@@ -59,8 +58,7 @@ def inc_chapter(file: Path, url_only: bool, yes: bool, dryrun: bool) -> bool:
         if dryrun:
             print("This is a dry run!")
         else:
-            with file.open("w") as f:
-                f.write(output)
+            file.write_text(output)
         if not url_only:
             mv(file, file.parent / new_base, dryrun=dryrun)
         return True

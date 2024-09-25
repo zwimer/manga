@@ -39,9 +39,8 @@ def extract_url(file: Path):
     file = file.resolve()
     assert file.exists(), f"{file} does not exist"
     assert file.suffix, f"{file} has no extension"
-    with file.open("r") as f:
-        try:
-            data = f.read()
-        except UnicodeDecodeError as e:
-            raise RuntimeError(f"Failed to read: {file}") from e
+    try:
+        data = file.read_text()
+    except UnicodeDecodeError as e:
+        raise RuntimeError(f"Failed to read: {file}") from e
     return extract_url_from_contents(data.strip(), file.suffix)
