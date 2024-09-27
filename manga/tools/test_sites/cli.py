@@ -15,18 +15,16 @@ class Supported(argparse.Action):
         sys.exit(0)
 
 
-def main(prog: str, *args: str) -> bool:
+def cli() -> None:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
-    parser = argparse.ArgumentParser(prog=Path(prog).name)
-    parser.add_argument("--supported", action=Supported, nargs="?")
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--supported",
+        action=Supported,
+        nargs="?",
+        help="Show supported sites containign this string then exit. If no string is passed, show all supported sites",
+    )
     parser.add_argument("directory", type=Path, help="The directory to test")
-    parser.add_argument("--skip", type=str, nargs="+", default=[], help="Domains to skip")
-    parser.add_argument(
-        "--skip-tiny", action="store_true", help="Do not open sites that were not tested because of a low chapter count"
-    )
-    parser.add_argument(
-        "--skip-point-five", action="store_true", help="Do not open sites have a .5 chapter after the latest chapter"
-    )
     parser.add_argument("--opener", default="open", help="The default binary to open a URL with")
     parser.add_argument("--no-prompt", action="store_true", help="Auto open sites when complete, do not prompt user")
     parser.add_argument(
@@ -35,8 +33,12 @@ def main(prog: str, *args: str) -> bool:
         type=int,
         help="The number of seconds each thread should wait between testing sites (to avoid DOSing)",
     )
-    return test_sites(**vars(parser.parse_args(args)))
-
-
-def cli() -> None:
-    sys.exit(0 if main(*sys.argv) else -1)
+    skip = parser.add_argument_group("Skip Options")
+    skip.add_argument("--skip", type=str, nargs="+", default=[], help="Domains to skip")
+    skip.add_argument(
+        "--skip-tiny", action="store_true", help="Do not open sites that were not tested because of a low chapter count"
+    )
+    skip.add_argument(
+        "--skip-point-five", action="store_true", help="Do not open sites have a .5 chapter after the latest chapter"
+    )
+    sys.exit(0 if test_sites(**vars(parser.parse_args())) else -1)

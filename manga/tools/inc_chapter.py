@@ -67,16 +67,12 @@ def inc_chapter(file: Path, url_only: bool, yes: bool, dryrun: bool) -> bool:
     return False
 
 
-def main(prog: str, *args: str) -> bool:
-    parser = argparse.ArgumentParser(prog=Path(prog).name)
+def cli() -> None:
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "-y", "--yes", action="store_true", help="Automatically accept changes; will never prompt the user"
     )
     parser.add_argument("-n", "--dryrun", action="store_true", help="Do not actually change anything")
     parser.add_argument("-u", "--url_only", action="store_true", help="Only increment the URL, not the file name")
     parser.add_argument("file", type=Path, help="The file to increment the numbers of")
-    return inc_chapter(**vars(parser.parse_args(args)))
-
-
-def cli() -> None:
-    sys.exit(0 if main(*sys.argv) else -1)
+    sys.exit(0 if inc_chapter(**vars(parser.parse_args())) else -1)

@@ -4,7 +4,6 @@ import collections
 import argparse
 import platform
 import time
-import sys
 
 import osascript
 
@@ -76,16 +75,11 @@ def unnumbered_helper(dirs: list[Path]) -> None:
             print("Unknown")
 
 
-def main(prog: str, *argv: str) -> bool:
+def cli() -> None:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
-    parser = argparse.ArgumentParser(prog=Path(prog).name)
+    parser = argparse.ArgumentParser()
     parser.add_argument("dirs", type=Path, nargs="+", help="The unnumbered directories")
     try:
-        unnumbered_helper(**vars(parser.parse_args(argv)))
+        unnumbered_helper(**vars(parser.parse_args()))
     except KeyboardInterrupt:
         pass
-    return True
-
-
-def cli() -> None:
-    sys.exit(0 if main(*sys.argv) else -1)

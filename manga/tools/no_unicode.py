@@ -47,12 +47,8 @@ def no_unicode(paths: list[Path], dryrun: bool) -> bool:
     return True
 
 
-def main(argv) -> bool:
-    parser = argparse.ArgumentParser(prog=Path(argv[0]).name)
+def cli() -> None:
+    parser = argparse.ArgumentParser()
     parser.add_argument("-M", "--dryrun", action="store_true", default=False)
     parser.add_argument("paths", type=Path, nargs="+")
-    return no_unicode(**vars(parser.parse_args(argv)))
-
-
-def cli() -> None:
-    sys.exit(0 if main(sys.argv) else -1)
+    sys.exit(0 if no_unicode(**vars(parser.parse_args())) else -1)

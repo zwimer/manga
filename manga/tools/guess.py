@@ -290,9 +290,9 @@ def guess(directory: Path, files: list[Path], yes: bool, force: bool, dryrun: bo
     return True
 
 
-def main(prog: str, *args: str) -> bool:
+def cli() -> None:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
-    parser = argparse.ArgumentParser(prog=Path(prog).name)
+    parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--force", action="store_true", help="Override safety checks")
     parser.add_argument(
         "-y", "--yes", action="store_true", help="Automatically accept changes; will never prompt the user"
@@ -306,11 +306,7 @@ def main(prog: str, *args: str) -> bool:
         help="The files in this directory will be what the input files are compared against",
     )
     parser.add_argument("files", type=Path, nargs="+", help="The files to guess")
-    ns = parser.parse_args(args)
+    ns = parser.parse_args()
     if ns.force and not ns.yes:
         raise RuntimeError("-f, --force requires -y, --yes")
-    return guess(**vars(ns))
-
-
-def cli() -> None:
-    sys.exit(0 if main(*sys.argv) else -1)
+    sys.exit(0 if guess(**vars(ns)) else -1)
