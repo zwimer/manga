@@ -48,6 +48,7 @@ def mangakakalot_online(data: str) -> bool:
 
 
 def manganelo_com(data: str) -> bool:
+    # This still returns an ok status, it just says 404
     return "404 - PAGE NOT FOUND" not in data and "This page does not exist or has been deleted." not in data
 
 
@@ -67,10 +68,12 @@ def mangakakalot_today(data: str) -> bool:
 
 
 def chapmanganato_to(data: str) -> bool:
+    # This still returns an ok status, it just says 404
     return "404 NOT FOUND" not in data and "LOAD ALL" in data
 
 
 def chapmanganato_com(data: str) -> bool:
+    # This still returns an ok status, it just says 404
     return "404 NOT FOUND" not in data and "LOAD ALL" in data
 
 
@@ -166,4 +169,5 @@ domains: dict[str, Callable[[str], bool]] = {
     # Returns 404 if no new chapter
     #
     "kingofshojo.com": true_,
+    "rackusreads.com": true_,
 }
