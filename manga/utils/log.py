@@ -3,11 +3,11 @@ from functools import cache
 from pathlib import Path
 import logging
 
-from .singleton import Singleton
+from zstdlib import Singleton
 
 
 @dataclass
-class Defaults(metaclass=Singleton):
+class Defaults(Singleton):
     root: logging.Logger = logging.getLogger("manga")
     path: Path = Path("/tmp/manga_scrape.log")
     level: int = logging.INFO

@@ -14,6 +14,7 @@ classifiers = [
 urls = {Homepage = "https://github.com/zwimer/manga"}
 requires-python = ">=3.10"
 dependencies = [
+	"zstdlib",
     "osascript",
     "regex",
     "requests",
