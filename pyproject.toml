@@ -14,13 +14,14 @@ classifiers = [
 urls = {Homepage = "https://github.com/zwimer/manga"}
 requires-python = ">=3.10"
 dependencies = [
-	"zstdlib",
+    "argcomplete",
+    "zstdlib",
     "osascript",
     "regex",
     "requests",
+    "rich",
     "tldextract",
     "tqdm",
-    "rich",
 ]
 dynamic = ["version"]
 

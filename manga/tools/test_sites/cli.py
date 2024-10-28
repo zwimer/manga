@@ -3,6 +3,8 @@ import argparse
 import platform
 import sys
 
+import argcomplete
+
 from manga.sites import domains
 from .test_sites import test_sites
 
@@ -41,6 +43,7 @@ def cli() -> None:
     skip.add_argument(
         "--skip-point-five", action="store_true", help="Do not open sites have a .5 chapter after the latest chapter"
     )
+    argcomplete.autocomplete(parser)  # Tab completion
     ns = parser.parse_args()
     del ns.supported
     sys.exit(0 if test_sites(**vars(ns)) else -1)

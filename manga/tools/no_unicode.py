@@ -3,6 +3,8 @@ from pathlib import Path
 import argparse
 import sys
 
+import argcomplete
+
 from manga.utils import mv
 
 
@@ -51,4 +53,5 @@ def cli() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("-M", "--dryrun", action="store_true", default=False)
     parser.add_argument("paths", type=Path, nargs="+")
+    argcomplete.autocomplete(parser)  # Tab completion
     sys.exit(0 if no_unicode(**vars(parser.parse_args())) else -1)

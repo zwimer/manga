@@ -8,6 +8,8 @@ import argparse
 import sys
 import re
 
+import argcomplete
+
 from manga.utils import split_on_num, extract_url, lsf, mv
 
 
@@ -306,6 +308,7 @@ def cli() -> None:
         help="The files in this directory will be what the input files are compared against",
     )
     parser.add_argument("files", type=Path, nargs="+", help="The files to guess")
+    argcomplete.autocomplete(parser)  # Tab completion
     ns = parser.parse_args()
     if ns.force and not ns.yes:
         raise RuntimeError("-f, --force requires -y, --yes")

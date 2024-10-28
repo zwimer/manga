@@ -3,6 +3,8 @@ from pathlib import Path
 import argparse
 import sys
 
+import argcomplete
+
 from manga.utils import extract_url_from_contents, split_on_num, mv
 
 
@@ -75,4 +77,5 @@ def cli() -> None:
     parser.add_argument("-n", "--dryrun", action="store_true", help="Do not actually change anything")
     parser.add_argument("-u", "--url_only", action="store_true", help="Only increment the URL, not the file name")
     parser.add_argument("file", type=Path, help="The file to increment the numbers of")
+    argcomplete.autocomplete(parser)  # Tab completion
     sys.exit(0 if inc_chapter(**vars(parser.parse_args())) else -1)
