@@ -105,6 +105,10 @@ def manhwatop_com(data: str) -> bool:
     return "loader.svg" in data and "Show more" not in data
 
 
+def manhwatop_org(data: str) -> bool:
+    return "Next" in data and "Show more" not in data
+
+
 def zinmanga_com(data: str) -> bool:
     return "single-chapter-select" in data and "TRENDING" not in data
 
@@ -123,6 +127,14 @@ def harimanga_me(data: str) -> bool:
 
 def harimanga_com(data: str) -> bool:
     return '"prev":"Prev","next":"Next' in data and "#manga-discussion" not in data
+
+
+def oniscan_com(data: str) -> bool:
+    return "next-nav" in data and "Next" not in data
+
+
+def mangakatana_com(data: str) -> bool:
+    return "send_img_err = false" in data and 'prev" disabled="disabled' not in data
 
 
 # Special functions
@@ -161,19 +173,26 @@ domains: dict[str, Callable[[str], bool]] = {
     "chapmanganato.com": chapmanganato_com,
     "chapmanganato.to": chapmanganato_to,
     #
+    "harimanga.com": harimanga_com,
+    "harimanga.me": harimanga_me,
+    #
+    "manhuaus.com": manhuaus_com,
+    "manhuaus.org": manhuaus_org,
+    #
+    "mangakatana.com": mangakatana_com,
     "manga4life.com": manga4life_com,
     "manhuascan.com": manhuascan_com,
     "manhwatop.com": manhwatop_com,
-    "harimanga.com": harimanga_com,
-    "harimanga.me": harimanga_me,
-    "manhuaus.com": manhuaus_com,
-    "manhuaus.org": manhuaus_org,
+    "manhuatop.org": manhwatop_org,
     "zinmanga.com": zinmanga_com,
     "kunmanga.com": kunmanga_com,
+    "oniscan.com": oniscan_com,
     #
     # Returns 404 if no new chapter
     #
+    "manhwabuddy.com": true_,
     "kingofshojo.com": true_,
     "rackusreads.com": true_,
+    "mangareader.to": true_,
     "mgeko.cc": true_,
 }
