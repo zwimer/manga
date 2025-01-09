@@ -32,7 +32,7 @@ def read_dir(d: Path, *, remove_numbers: bool = False) -> dict[str, Path]:
     Return a dict mapping the scrubbed URLs they contain to the files within
     Fails if two files contain the same URLs after scrubbing
     """
-    files: tuple[Path, ...] = lsf(d)
+    files: list[Path] = lsf(d)
     scrub_to_file: dict[str, list[Path]] = collections.defaultdict(list)
     for f in files:
         scb: str = scrub(extract_url(f), remove_numbers=remove_numbers)

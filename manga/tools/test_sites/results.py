@@ -22,7 +22,7 @@ def _fmt(x: URL) -> str:
 
 
 def print_no_open_failures(state: State) -> None:
-    no_open: tuple[URL, ...] = state.get(NoOpen)
+    no_open: list[URL] = state.get(NoOpen)
     if no_open:
         print(f"{'*'*70}\n*{'Errors'.center(68)}*\n{'*'*70}\n")
         for type_ in {cast(NoOpen, i.status).__class__ for i in no_open}:  # Set de-dups
@@ -32,7 +32,7 @@ def print_no_open_failures(state: State) -> None:
 
 
 def print_open_failures(state: State, no_prompt: bool, skip_tiny: bool, skip_point_five: bool, opener: str) -> None:
-    to_open: tuple[URL, ...] = state.get(ToOpen)
+    to_open: list[URL] = state.get(ToOpen)
     if not to_open:
         return
     if not no_prompt:

@@ -20,7 +20,7 @@ def handle_results(urls: set[str], tested: Tested) -> None:
     if len(tested.skip) > 0:
         print("The following domains were skipped:")
         print("\t" + "\n\t".join(sorted(tested.skip)))
-    all_tested = set().union(*astuple(tested))
+    all_tested = set.union(*astuple(tested))
     if len(all_tested) != len(urls):
         print("The following domains were not tested:")
         print("\t" + "\n\t".join(sorted(urls - all_tested)))

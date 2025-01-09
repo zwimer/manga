@@ -23,7 +23,7 @@ class URL:
 
 class State:
     def __init__(self, urls: set[str]) -> None:
-        self._urls: tuple[URL, ...] = tuple(URL(i) for i in urls)
+        self._urls: list[URL] = [URL(i) for i in urls]
 
     def __len__(self) -> int:
         return len(self._urls)
@@ -34,5 +34,5 @@ class State:
             bucketed[i.domain].append(i)
         return bucketed
 
-    def get(self, status_type: type[Status]) -> tuple[URL, ...]:
-        return tuple(i for i in self._urls if isinstance(i.status, status_type))
+    def get(self, status_type: type[Status]) -> list[URL]:
+        return [i for i in self._urls if isinstance(i.status, status_type)]

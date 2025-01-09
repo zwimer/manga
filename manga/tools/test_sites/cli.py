@@ -12,7 +12,7 @@ from .test_sites import test_sites
 class Supported(argparse.Action):
     def __call__(self, _, _2, arg, _3):
         arg = ("" if arg is None else arg).split("//", 1)[-1].split("/")[0]
-        match = tuple(i for i in domains if arg in i)
+        match = [i for i in domains if arg in i]
         print("No matches found." if len(match) == 0 else "\n".join(match))
         sys.exit(0)
 
