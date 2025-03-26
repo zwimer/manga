@@ -12,6 +12,14 @@ from collections.abc import Callable
 #
 
 
+def mangakakalot_gg(data: str) -> bool:
+    return "next" in data and "PREV CHAPTER" in data and "moveToListChapter" not in data
+
+
+def natomanga_com(data: str) -> bool:
+    return "next" in data and "PREV CHAPTER" in data and "moveToListChapter" not in data
+
+
 def mangakakalot_tv(data: str) -> bool:
     return "next-chap:hover" in data and "logo_chapter" in data
 
@@ -150,6 +158,9 @@ def true_(_: str) -> bool:
 
 
 domains: dict[str, Callable[[str], bool]] = {
+    "mangakakalot.gg": mangakakalot_gg,
+    "natomanga.com": natomanga_com,
+    #
     "mangatx.com": mangatx_com,
     "toonclash.com": toonclash_com,
     "mangaclash.com": mangaclash_com,
