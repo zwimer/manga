@@ -5,6 +5,7 @@ import argparse
 import platform
 import time
 
+# PYTHON_ARGCOMPLETE_OK
 import osascript
 import argcomplete
 

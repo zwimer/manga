@@ -3,6 +3,7 @@ from pathlib import Path
 import argparse
 import sys
 
+# PYTHON_ARGCOMPLETE_OK
 import argcomplete
 
 from manga.utils import extract_url_from_contents, split_on_num, mv

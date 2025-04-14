@@ -8,6 +8,7 @@ import argparse
 import sys
 import re
 
+# PYTHON_ARGCOMPLETE_OK
 import argcomplete
 
 from manga.utils import split_on_num, extract_url, lsf, mv
