@@ -1,3 +1,4 @@
+from re import IGNORECASE, match
 from functools import cache
 from time import sleep
 
@@ -47,7 +48,7 @@ def test_url(url: str) -> Tested:
     """
     If url is broken, return a failure class for it
     """
-    if "vol" in url.lower():
+    if match(r"vol[^a-z\d]", url, IGNORECASE) or match(r"[^a-z\d]vol", url, IGNORECASE):
         return HasVol()
     left, n, right = split_on_num(url)
     if n != int(n):
