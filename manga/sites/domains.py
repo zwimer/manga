@@ -32,7 +32,19 @@ def mangaclash_com(data: str) -> bool:
     return "cursorNext" in data and "Alternative" not in data
 
 
+def manhuaus_com(data: str) -> bool:
+    return "btn prev_page" in data and "Show more" not in data
+
+
+def manhuaus_org(data: str) -> bool:
+    return "prev_page" in data and "main-menu" not in data
+
+
 def manhwatop_com(data: str) -> bool:
+    return "Next" in data and "Show more" not in data
+
+
+def manhwatop_org(data: str) -> bool:
     return "Next" in data and "Show more" not in data
 
 
@@ -79,8 +91,12 @@ domains: dict[str, Callable[[str], bool]] = {
     "harimanga.com": harimanga_com,
     "harimanga.me": harimanga_me,
     #
+    "manhuaus.com": manhuaus_com,
+    "manhuaus.org": manhuaus_org,
+    #
     "mangakatana.com": mangakatana_com,
     "manhwatop.com": manhwatop_com,
+    "manhuatop.org": manhwatop_org,
     "kunmanga.com": kunmanga_com,
     "oniscan.com": oniscan_com,
     #
