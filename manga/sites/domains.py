@@ -106,5 +106,6 @@ domains: dict[str, Callable[[str], bool]] = {
     "kingofshojo.com": true_,
     "rackusreads.com": true_,
     "mangareader.to": true_,
+    "rawkuma.net": true_,
     "mgeko.cc": true_,
 }

@@ -5,9 +5,7 @@ import argparse
 import platform
 import time
 
-# PYTHON_ARGCOMPLETE_OK
 import osascript
-import argcomplete
 
 from manga.utils import split_on_num, extract_url, lsf, get_logger
 
@@ -81,7 +79,6 @@ def cli() -> None:
     assert "Darwin" == platform.system(), "Not on Mac! Remember to change name and ext!"
     parser = argparse.ArgumentParser()
     parser.add_argument("dirs", type=Path, nargs="+", help="The unnumbered directories")
-    argcomplete.autocomplete(parser)  # Tab completion
     try:
         unnumbered_helper(**vars(parser.parse_args()))
     except KeyboardInterrupt:

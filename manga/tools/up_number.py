@@ -2,9 +2,6 @@ from pathlib import Path
 import argparse
 import sys
 
-# PYTHON_ARGCOMPLETE_OK
-import argcomplete
-
 from manga.utils import split_on_num, mv
 
 
@@ -49,5 +46,4 @@ def cli() -> None:
     )
     parser.add_argument("file", type=Path, help="The file to increase the number of")
     parser.add_argument("number", type=float, help="The number to increment file to")
-    argcomplete.autocomplete(parser)  # Tab completion
     sys.exit(0 if up_number(**vars(parser.parse_args())) else -1)

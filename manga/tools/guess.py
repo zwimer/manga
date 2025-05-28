@@ -8,9 +8,6 @@ import argparse
 import sys
 import re
 
-# PYTHON_ARGCOMPLETE_OK
-import argcomplete
-
 from manga.utils import split_on_num, extract_url, lsf, mv
 
 
@@ -77,7 +74,7 @@ def scrub(x: str, *, remove_numbers: bool = False) -> str:
     For example: remove 'www.' since not all URLs need this
     """
     # Trim
-    x = x.split("?")[0]
+    x = x.split("?", 1)[0].split("#", 1)[0]
 
     # Remove unimportant words
     x = x.lower()
@@ -309,7 +306,6 @@ def cli() -> None:
         help="The files in this directory will be what the input files are compared against",
     )
     parser.add_argument("files", type=Path, nargs="+", help="The files to guess")
-    argcomplete.autocomplete(parser)  # Tab completion
     ns = parser.parse_args()
     if ns.force and not ns.yes:
         raise RuntimeError("-f, --force requires -y, --yes")
