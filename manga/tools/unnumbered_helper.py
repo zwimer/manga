@@ -4,10 +4,14 @@ import collections
 import argparse
 import platform
 import time
+import os
 
 import osascript
 
 from manga.utils import split_on_num, extract_url, lsf, get_logger
+
+
+BROWSER = os.getenv("BROWSER", "Brave Browser")
 
 
 def scrub(url: str) -> str:
@@ -46,7 +50,7 @@ def get_url() -> str:
     """
     Get the URL of the current tab
     """
-    cmd: str = 'tell application "Google Chrome" to return URL of active tab of front window'
+    cmd: str = f'tell application "{BROWSER}" to return URL of active tab of front window'
     code, out, err = osascript.run(cmd)
     assert code == 0, err
     return out
@@ -55,7 +59,7 @@ def get_url() -> str:
 def unnumbered_helper(dirs: list[Path]) -> None:
     """
     Print out the number of the chapter associated
-    with the manga displayed in the frontmost Chrome tab
+    with the manga displayed in the frontmost Brave tab
     """
     for i in dirs:
         assert i.exists(), f"{i} does not exist"
