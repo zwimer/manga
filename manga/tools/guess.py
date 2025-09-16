@@ -282,7 +282,7 @@ def guess(directory: Path, files: list[Path], yes: bool, force: bool, dryrun: bo
             fails.append(f)
     # If anything failed, print out info
     if fails:
-        print("Failed for the following:\n\t" + "\n\t".join(str(i) for i in fails))
+        print("Failed for the following:\n\t" + "\n\t".join(map(str, fails)))
         return False
     print("All files properly guessed!")
     if dryrun:
