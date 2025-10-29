@@ -1,4 +1,3 @@
-from __future__ import annotations
 from collections.abc import Sequence, Callable
 from pathlib import Path
 from typing import Any
