@@ -57,9 +57,10 @@ def test_sites(
     """
     Test each file in directory, print the results open them as needed
     """
-    if isinstance(skip, list):
-        return test_sites(directory, set(skip), opener, skip_tiny, skip_point_five, no_prompt, delay)
+    skip = {i.split("://")[-1].split("/")[0] for i in skip}
     print("Checking arguments...")
+    assert all("." in i for i in skip), "Non-domain in --skip"
+    assert not any("http://" in i for i in skip), "http:// in --skip"
     directory = directory.resolve()
     assert delay >= 0, "Delay may not be negative"
     assert directory.exists(), f"{directory} does not exist"

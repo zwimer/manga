@@ -36,7 +36,7 @@ def cli() -> None:
         help="The number of seconds each thread should wait between testing sites (to avoid DOSing)",
     )
     skip = parser.add_argument_group("Skip Options")
-    skip.add_argument("--skip", type=str, nargs="+", default=[], help="Domains to skip")
+    skip.add_argument("--skip", type=str, nargs="+", action="extend", default=[], help="Domains to skip")
     skip.add_argument(
         "--skip-tiny", action="store_true", help="Do not open sites that were not tested because of a low chapter count"
     )

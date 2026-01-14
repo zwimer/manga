@@ -15,10 +15,6 @@ def mangakakalot_gg(data: str) -> bool:
     return "next" in data and "PREV CHAPTER" in data and "moveToListChapter" not in data
 
 
-def natomanga_com(data: str) -> bool:
-    return "next" in data and "PREV CHAPTER" in data and "moveToListChapter" not in data
-
-
 def mangabuddy_com(data: str) -> bool:
     return '"Next chapter"' in data and '"Previous chapter"' in data
 
@@ -81,7 +77,6 @@ def true_(_: str) -> bool:
 
 domains: dict[str, Callable[[str], bool]] = {
     "mangakakalot.gg": mangakakalot_gg,
-    "natomanga.com": natomanga_com,
     #
     "toonclash.com": toonclash_com,
     "mangaclash.com": mangaclash_com,
@@ -105,6 +100,7 @@ domains: dict[str, Callable[[str], bool]] = {
     "kingofshojo.com": true_,
     "rackusreads.com": true_,
     "mangareader.to": true_,
+    "natomanga.com": true_,
     "rawkuma.net": true_,
     "mgeko.cc": true_,
 }
