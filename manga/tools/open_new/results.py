@@ -7,7 +7,7 @@ from tqdm import tqdm
 from .tested import Tested
 
 
-def handle_results(urls: set[str], tested: Tested) -> None:
+def handle_results(urls: set[str], tested: Tested, delay: float) -> None:
     """
     Print out the test results and open each of the given URLs that should not be ignored
     """
@@ -28,4 +28,4 @@ def handle_results(urls: set[str], tested: Tested) -> None:
     print("Opening manga...")
     for url in tqdm(urls - tested.ignore - tested.skip, dynamic_ncols=True):
         subprocess.check_call(["open", url], stdout=subprocess.DEVNULL)
-        sleep(0.2)  # Rate limit
+        sleep(delay)  # Rate limit

@@ -5,7 +5,6 @@ They take in as input the html of the webpage
 
 from collections.abc import Callable
 
-
 #
 # Return true if chapter is found
 #

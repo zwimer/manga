@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 from pathlib import Path
 
-
 __all__ = ("lsf", "mv")
 
 

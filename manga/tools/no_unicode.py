@@ -4,7 +4,6 @@ import sys
 
 from manga.utils import mv
 
-
 swap: dict[str, str] = {
     "￣": "",
     "∇": "",
@@ -21,6 +20,7 @@ swap: dict[str, str] = {
     "～": "~",
     "«": "<<",
     "»": ">>",
+    "꞉": ":",
 }
 
 

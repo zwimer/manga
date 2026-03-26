@@ -9,7 +9,6 @@ import osascript
 
 from manga.utils import split_on_num, extract_url, lsf, get_logger
 
-
 BROWSER = os.getenv("BROWSER", "Brave Browser")
 
 

@@ -22,7 +22,6 @@ from .status import (
     PointFive,
 )
 
-
 _success = Success()
 
 

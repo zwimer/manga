@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 __all__ = ("extract_url_from_contents", "extract_url")
 
 

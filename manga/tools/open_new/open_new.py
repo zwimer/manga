@@ -38,12 +38,12 @@ def evaluate(url: str, tested: Tested, pbar: tqdm.std.tqdm) -> None:
         pbar.update()
 
 
-def open_new(directory: Path, skip: set[str] | list[str]) -> bool:
+def open_new(directory: Path, skip: set[str] | list[str], delay: float) -> bool:
     """
     Open each file in directory that has a new chapter ready
     """
     if isinstance(skip, list):
-        return open_new(directory, set(skip))
+        return open_new(directory, set(skip), delay)
     print("Checking arguments...")
     directory = directory.resolve()
     assert directory.exists(), f"{directory} does not exist"
@@ -61,7 +61,7 @@ def open_new(directory: Path, skip: set[str] | list[str]) -> bool:
         mk_open_remaining_first = False
         print("Terminating executor...")
         executor.kill()
-        handle_results(urls, results)
+        handle_results(urls, results, delay)
         os._exit(0)  # pylint: disable=protected-access
 
     # Siginfo handler
@@ -87,5 +87,5 @@ def open_new(directory: Path, skip: set[str] | list[str]) -> bool:
                     else:
                         executor.add(evaluate, i, results, pbar)
     # Open links
-    handle_results(urls, results)
+    handle_results(urls, results, delay)
     return True

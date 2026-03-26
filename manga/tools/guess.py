@@ -9,7 +9,6 @@ import re
 
 from manga.utils import split_on_num, extract_url, lsf, mv
 
-
 # Config
 TOLERANCE: int = 20
 TRASH: Path = Path.home() / ".Trash/guess-manga/"
@@ -154,7 +153,7 @@ def choose(x: Any, near: Sequence[Any]) -> Any | None:
         if choice == len(near):
             return None
         return near[choice]
-    except (ValueError, AssertionError):
+    except ValueError, AssertionError:
         return choose(x, near)
 
 

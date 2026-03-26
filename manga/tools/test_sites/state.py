@@ -4,7 +4,6 @@ from manga.sites import get_domain
 
 from .status import Status, Untested
 
-
 _untested = Untested()
 
 
