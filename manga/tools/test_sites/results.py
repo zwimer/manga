@@ -49,7 +49,7 @@ def print_open_failures(state: State, no_prompt: bool, skip_tiny: bool, skip_poi
         print(f"{type_.kind()}\n\t" + "\n\t".join(_fmt(i) for i in got))
         for url in tqdm(got, dynamic_ncols=True, leave=False):
             subprocess.check_call([opener, url.url], stdout=subprocess.DEVNULL)
-        print("")
+        print()
 
 
 def results(state: State, no_prompt: bool, skip_tiny: bool, skip_point_five: bool, opener: str) -> None:

@@ -8,7 +8,7 @@ from zstdlib import Singleton
 
 @dataclass
 class Defaults(Singleton):
-    root: logging.Logger = logging.getLogger("manga")
+    root: logging.Logger = logging.getLogger("manga")  # noqa: RUF009
     path: Path = Path("/tmp/manga_scrape.log")
     level: int = logging.INFO
     file_level: int = logging.INFO

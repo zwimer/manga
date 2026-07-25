@@ -173,7 +173,7 @@ def disp_warning(x: str) -> None:
     boarder: str = delim + warn + delim
     blank: str = "*" + " " * (len(boarder) - 2) + "*"
     middle: str = "*" + x.center(len(boarder) - 2) + "*"
-    print("\n".join((boarder, blank, middle, blank, boarder)))
+    print("\n".join((boarder, blank, middle, blank, boarder)))  # noqa: FLY002
 
 
 # pylint: disable=too-many-locals
@@ -185,7 +185,7 @@ def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryru
     # Link match
     raw_data: str = extract_url(raw)
     scrubbed_data: str = scrub(raw_data)
-    options: list[str] = [i for i in data.keys() if are_same(scrubbed_data, i)]
+    options: list[str] = [i for i in data if are_same(scrubbed_data, i)]
     assert len(options) > 0, "Link matching failed"
     if len(options) > 1 and yes:
         raise RuntimeError("User input requires but --yes given, failing")
@@ -220,7 +220,7 @@ def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryru
         print(f"Old: {old_base}\n")
         diff_str = str(int(diff) if diff == int(diff) else diff)
         disp_warning(f"Chapter number difference of: {diff_str}")
-    print("")
+    print()
     if not yes:
         print("Accept? [N/?/y]")
         accept = input()

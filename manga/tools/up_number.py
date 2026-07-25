@@ -5,7 +5,7 @@ import sys
 from manga.utils import split_on_num, mv
 
 
-def up_number(file: Path, number: int, yes: bool, force: bool) -> bool:
+def up_number(file: Path, number: int | float, yes: bool, force: bool) -> bool:
     absolute: Path = file.absolute()
     file = file.resolve()
     # Santiy check
@@ -21,8 +21,7 @@ def up_number(file: Path, number: int, yes: bool, force: bool) -> bool:
     if not force:
         assert old_n < number, f"New number {number} is not greater than old number {old_n}"
         assert number <= old_n + 5, f"New number {number} is much larger than old number {old_n}"
-    n_str = str(int(number) if round(number) == number else number)
-    new: Path = file.parent / (left + n_str + right)
+    new: Path = file.parent / (left + str(number).removesuffix(".0") + right)
     # Prompt user
     print(f"Old: {file.name}\nNew: {new.name}\n\nAccept? [N/y]")
     accept: str = "y" if yes else input()

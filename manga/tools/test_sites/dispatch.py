@@ -32,16 +32,18 @@ class FuncType(Protocol):
 
 def dispatch(state: State, func: FuncType, *args: Any, **kwargs: Any) -> None:
     buckets = state.domains()
-    with Progress(
-        TextColumn("[progress.description]{task.description}"),
-        TaskProgressColumn(),
-        BarColumn(None),
-        MofNCompleteColumn(),
-        TimeRemainingColumn(compact=True, elapsed_when_finished=True),
-        transient=True,
-        expand=True,
-    ) as pbar:
-        with _ThreadHandler(max_workers=len(buckets)) as executor:  # No DOS-ing
-            for domain, urls in buckets.items():
-                task = pbar.add_task(f"{domain}:", total=len(urls))
-                executor.add(func, urls, lambda bound=task: pbar.update(bound, advance=1), *args, **kwargs)
+    with (
+        Progress(
+            TextColumn("[progress.description]{task.description}"),
+            TaskProgressColumn(),
+            BarColumn(None),
+            MofNCompleteColumn(),
+            TimeRemainingColumn(compact=True, elapsed_when_finished=True),
+            transient=True,
+            expand=True,
+        ) as pbar,
+        _ThreadHandler(max_workers=len(buckets)) as executor,
+    ):  # No DOS-ing
+        for domain, urls in buckets.items():
+            task = pbar.add_task(f"{domain}:", total=len(urls))
+            executor.add(func, urls, lambda bound=task: pbar.update(bound, advance=1), *args, **kwargs)

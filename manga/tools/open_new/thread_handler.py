@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Protocol
 from concurrent.futures import thread
+from typing import Self
 import signal
 
 if TYPE_CHECKING:
@@ -32,7 +33,7 @@ class ThreadHandler(thread.ThreadPoolExecutor):
         for i in self.futures:
             i.cancel()
 
-    def __enter__(self) -> ThreadHandler:
+    def __enter__(self) -> Self:
         self._orig: dict[signal.Signals, Any] = {s: self._install_handler(s, f) for s, f in self._handlers.items()}
         rv = super().__enter__()
         assert rv is self

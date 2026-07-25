@@ -52,7 +52,7 @@ def inc_chapter(file: Path, url_only: bool, yes: bool, dryrun: bool) -> bool:
         accept = input()
     # Act on prompt input
     if accept == "y":
-        print("")
+        print()
         output: str = left + new_url + right
         if dryrun:
             print("This is a dry run!")

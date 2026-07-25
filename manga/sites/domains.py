@@ -10,24 +10,12 @@ from collections.abc import Callable
 #
 
 
-def mangakakalot_gg(data: str) -> bool:
-    return "next" in data and "PREV CHAPTER" in data and "moveToListChapter" not in data
+# def mangakakalot_gg(data: str) -> bool:
+#     return "next" in data and "PREV CHAPTER" in data and "moveToListChapter" not in data
 
 
-def mangabuddy_com(data: str) -> bool:
-    return '"Next chapter"' in data and '"Previous chapter"' in data
-
-
-def toonclash_com(data: str) -> bool:
-    return "cursorNext" in data and "Alternative" not in data
-
-
-def mangaclash_com(data: str) -> bool:
-    return "cursorNext" in data and "Alternative" not in data
-
-
-def manhuaus_com(data: str) -> bool:
-    return "btn prev_page" in data and "Show more" not in data
+# def manhuaus_com(data: str) -> bool:
+#     return "btn prev_page" in data and "Show more" not in data
 
 
 def manhuaus_org(data: str) -> bool:
@@ -40,10 +28,6 @@ def manhwatop_com(data: str) -> bool:
 
 def manhwatop_org(data: str) -> bool:
     return "Next" in data and "Show more" not in data
-
-
-def kunmanga_com(data: str) -> bool:
-    return "chapters_selectbox_holder" in data and "LATEST MANGA RELEASES" not in data
 
 
 def harimanga_me(data: str) -> bool:
@@ -75,22 +59,17 @@ def true_(_: str) -> bool:
 
 
 domains: dict[str, Callable[[str], bool]] = {
-    "mangakakalot.gg": mangakakalot_gg,
-    #
-    "toonclash.com": toonclash_com,
-    "mangaclash.com": mangaclash_com,
-    "mangabuddy.com": mangabuddy_com,
+    # "mangakakalot.gg": mangakakalot_gg,
     #
     "harimanga.com": harimanga_com,
     "harimanga.me": harimanga_me,
     #
-    "manhuaus.com": manhuaus_com,
+    # "manhuaus.com": manhuaus_com,
     "manhuaus.org": manhuaus_org,
     #
     "mangakatana.com": mangakatana_com,
     "manhwatop.com": manhwatop_com,
     "manhuatop.org": manhwatop_org,
-    "kunmanga.com": kunmanga_com,
     "oniscan.com": oniscan_com,
     #
     # Returns 404 if no new chapter
@@ -99,7 +78,8 @@ domains: dict[str, Callable[[str], bool]] = {
     "kingofshojo.com": true_,
     "rackusreads.com": true_,
     "mangareader.to": true_,
-    "natomanga.com": true_,
+    # "natomanga.com": true_,
     "rawkuma.net": true_,
+    # "mangak.io": true_,
     "mgeko.cc": true_,
 }

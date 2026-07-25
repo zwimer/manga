@@ -19,8 +19,7 @@ def scrub(url: str) -> str:
     url = "".join(url.split("//")[1:])
     if "." in url[:4]:
         url = url.split(".", 1)[1]
-    if url.endswith("/"):
-        url = url[:-1]
+    url = url.removesuffix("/")
     if "?" in url:
         url = url.split("?", 1)[0]
     return url

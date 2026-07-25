@@ -23,8 +23,7 @@ def get_domain(url: str) -> str:
     """
     Extract the domain portion of a URL
     """
-    info: tldextract.tldextract.ExtractResult = tldextract.extract(url)
-    return f"{info.domain}.{info.suffix}"
+    return tldextract.extract(url).top_domain_under_public_suffix
 
 
 def _test(url: str, fn: Callable[[str], bool], timeout: float, timeout_retries: int, base_delay: float) -> bool:

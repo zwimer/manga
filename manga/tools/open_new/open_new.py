@@ -32,7 +32,7 @@ def evaluate(url: str, tested: Tested, pbar: tqdm.std.tqdm) -> None:
         tested.unknown.add(url)
     except requests.exceptions.RequestException:
         tested.failed.add(url)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(f"Thread failed: {e}")
     finally:
         pbar.update()
@@ -75,17 +75,20 @@ def open_new(directory: Path, skip: set[str] | list[str], delay: float) -> bool:
 
     # Determine what to open
     print(f"Making at most {len(urls)} requests...")
-    with tqdm.tqdm(total=len(urls), dynamic_ncols=True) as pbar:
-        with redirect_print_to_tqdm():
-            with ThreadHandler(
-                max_workers=32, handlers={Signals.SIGINT: sigint_handler, Signals.SIGINFO: siginfo_handler}
-            ) as executor:
-                for i in urls:
-                    if sites.get_domain(i) in skip:
-                        results.skip.add(i)
-                        pbar.update()
-                    else:
-                        executor.add(evaluate, i, results, pbar)
+    with (
+        tqdm.tqdm(total=len(urls), dynamic_ncols=True) as pbar,
+        redirect_print_to_tqdm(),
+        ThreadHandler(
+            max_workers=32, handlers={Signals.SIGINT: sigint_handler, Signals.SIGINFO: siginfo_handler}
+        ) as executor,
+    ):
+        for i in urls:
+            if sites.get_domain(i) in skip:
+                results.skip.add(i)
+                pbar.update()
+            else:
+                executor.add(evaluate, i, results, pbar)
+
     # Open links
     handle_results(urls, results, delay)
     return True

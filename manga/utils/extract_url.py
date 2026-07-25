@@ -1,6 +1,6 @@
 from pathlib import Path
 
-__all__ = ("extract_url_from_contents", "extract_url")
+__all__ = ("extract_url", "extract_url_from_contents")
 
 
 def _half(what: str, where: str) -> tuple[str, str]:
