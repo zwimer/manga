@@ -30,13 +30,14 @@ file = "README.md"
 content-type = "text/markdown"
 
 [project.scripts]
+close-unwanted-tabs = "manga.tools.close_unwanted_tabs:cli"
 guess = "manga.tools.guess:cli"
 inc-chapter = "manga.tools.inc_chapter:cli"
+no-unicode = "manga.tools.no_unicode:cli"
 open-new = "manga.tools.open_new:cli"
 test-sites = "manga.tools.test_sites:cli"
 unnumbered-helper = "manga.tools.unnumbered_helper:cli"
 up-number = "manga.tools.up_number:cli"
-no-unicode = "manga.tools.no_unicode:cli"
 
 [tool.setuptools]
 license-files = ["LICENSE"]
