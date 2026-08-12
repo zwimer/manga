@@ -16,7 +16,7 @@ requires-python = ">=3.14"
 dependencies = [
     "argcomplete",
     "zstdlib>=0.3.2",
-    "osascript",
+    "osascript2",
     "regex",
     "requests",
     "rich",
