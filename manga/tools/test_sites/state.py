@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from manga.sites import get_domain
 
 from .status import Status, Untested
@@ -28,9 +26,9 @@ class State:
         return len(self._urls)
 
     def domains(self) -> dict[str, list[URL]]:
-        bucketed = defaultdict(list)
+        bucketed: dict[str, list[URL]] = {}
         for i in self._urls:
-            bucketed[i.domain].append(i)
+            bucketed.setdefault(i.domain, []).append(i)
         return bucketed
 
     def get(self, status_type: type[Status]) -> list[URL]:
