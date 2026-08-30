@@ -23,8 +23,7 @@ MAX_CHAPTER: int = 2500  # Higher has an increased chance of error
 
 
 def read_dir(d: Path, *, remove_numbers: bool = False) -> dict[str, Path]:
-    """
-    Read the files in a directory
+    """Read the files in a directory
     Return a dict mapping the scrubbed URLs they contain to the files within
     Fails if two files contain the same URLs after scrubbing
     """
@@ -49,8 +48,7 @@ def read_dir(d: Path, *, remove_numbers: bool = False) -> dict[str, Path]:
 
 
 def remove_unwanted_periods(x: str) -> str:
-    """
-    Remove periods that are not part of a number
+    """Remove periods that are not part of a number
     Numbers are assumed to start and end with a digit, not a decimal point
     """
     for offset, pat in enumerate((r"\.[^\d]", r"[^\d]\.")):
@@ -67,8 +65,7 @@ def remove_unwanted_periods(x: str) -> str:
 
 
 def scrub(x: str, *, remove_numbers: bool = False) -> str:
-    """
-    Scrub a URL clean of 'mucky' information that makes it hard to compare with others
+    """Scrub a URL clean of 'mucky' information that makes it hard to compare with others
     For example: remove 'www.' since not all URLs need this
     """
     # Trim
@@ -95,8 +92,7 @@ def scrub(x: str, *, remove_numbers: bool = False) -> str:
 
 
 def diff_helper(a: str, b: str) -> tuple[str, str]:
-    """
-    Return the substrings of a and b whose first character
+    """Return the substrings of a and b whose first character
     is the first character that differs between a and b
     """
     r: int = min(len(a), len(b))
@@ -107,8 +103,7 @@ def diff_helper(a: str, b: str) -> tuple[str, str]:
 
 
 def are_same(guessing: str, compare_to: str) -> bool:
-    """
-    Determine if guessing and compare_to link to the same manga, and that they link to chapters
+    """Determine if guessing and compare_to link to the same manga, and that they link to chapters
     If they are both the same manga and same chapter, an exception is raised
     compare_to may not contain guessing, and guessing must contain a chapter!
     """
@@ -135,8 +130,7 @@ def are_same(guessing: str, compare_to: str) -> bool:
 
 
 def choose(x: Any, near: Sequence[Any]) -> Any | None:
-    """
-    Prompt the user to select the nearest element in near to x
+    """Prompt the user to select the nearest element in near to x
     If near only has one option, that choice is selected automatically
     May return None if the user selects no option
     """
@@ -165,9 +159,7 @@ def choose(x: Any, near: Sequence[Any]) -> Any | None:
 
 
 def disp_warning(x: str) -> None:
-    """
-    Print out a warning: x
-    """
+    """Print out a warning: x"""
     warn: str = " WARNING "
     delim: str = "*" * max(18, round((8 + len(x) - len(warn)) / 2))
     boarder: str = delim + warn + delim
@@ -178,8 +170,7 @@ def disp_warning(x: str) -> None:
 
 # pylint: disable=too-many-locals
 def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryrun: bool) -> bool:
-    """
-    Try to replace the file in old for the same manga with raw, editing the title as needed
+    """Try to replace the file in old for the same manga with raw, editing the title as needed
     Return true on success
     """
     # Link match
@@ -251,8 +242,7 @@ def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryru
 
 
 def guess(directory: Path, files: list[Path], yes: bool, force: bool, dryrun: bool) -> bool:
-    """
-    Try to update each file in directory corresponding to a file to guess
+    """Try to update each file in directory corresponding to a file to guess
     If yes, auto accepts proposed update; if force, ignores safety requirements
     If dryrun, nothing is actually done
     returns False on failure

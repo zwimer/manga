@@ -31,9 +31,7 @@ def _test_site(url: str) -> bool:
 
 
 def _test(left: str, right: str, x: float) -> bool:
-    """
-    Test if chapter x is found at a URL constructed from left, right, and x
-    """
+    """Test if chapter x is found at a URL constructed from left, right, and x"""
     if int(x) == x:
         return _test_site(f"{left}{int(x)}{right}")
     else:
@@ -44,9 +42,7 @@ def _test(left: str, right: str, x: float) -> bool:
 
 # pylint: disable=too-many-return-statements,too-many-branches
 def test_url(url: str) -> Tested:
-    """
-    If url is broken, return a failure class for it
-    """
+    """If url is broken, return a failure class for it"""
     if match(r"vol[^a-z\d]", url, IGNORECASE) or match(r"[^a-z\d]vol", url, IGNORECASE):
         return HasVol()
     left, n, right = split_on_num(url)

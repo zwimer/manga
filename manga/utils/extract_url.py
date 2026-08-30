@@ -10,9 +10,7 @@ def _half(what: str, where: str) -> tuple[str, str]:
 
 
 def extract_url_from_contents(data: str, extension: str) -> str:
-    """
-    Extract the URL from the file data
-    """
+    """Extract the URL from the file data"""
     upper: str
     lower: str
     if ".url" == extension:
@@ -31,9 +29,7 @@ def extract_url_from_contents(data: str, extension: str) -> str:
 
 
 def extract_url(file: Path):
-    """
-    Extract the URL from the file
-    """
+    """Extract the URL from the file"""
     file = file.resolve()
     assert file.exists(), f"{file} does not exist"
     assert file.suffix, f"{file} has no extension"

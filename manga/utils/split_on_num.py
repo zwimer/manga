@@ -2,8 +2,7 @@ import regex
 
 
 def split_on_num(x: str, only_positive: bool = True) -> tuple[str, float, str]:
-    """
-    Split x at the number greater than one
+    """Split x at the number greater than one
     This assumes numbers end in a digit, not a decimal point
     If only_positive, negative signs will not count as part of a number
     Returns a tuple containing the string before the last number,

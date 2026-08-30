@@ -25,18 +25,14 @@ swap: dict[str, str] = {
 
 
 def replace_unicode(x: str) -> str:
-    """
-    Replace unicode in x
-    """
+    """Replace unicode in x"""
     for i, k in swap.items():
         x = x.replace(i, k)
     return x
 
 
 def no_unicode(paths: list[Path], dryrun: bool) -> bool:
-    """
-    Remove unicode in each path's name
-    """
+    """Remove unicode in each path's name"""
     for path in paths:
         path = path.absolute()
         assert path.exists(), f"{path} does not exist"

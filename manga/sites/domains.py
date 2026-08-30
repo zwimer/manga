@@ -1,5 +1,4 @@
-"""
-The functions in this file return true if a chapter is found for the specific site
+"""The functions in this file return true if a chapter is found for the specific site
 They take in as input the html of the webpage
 """
 

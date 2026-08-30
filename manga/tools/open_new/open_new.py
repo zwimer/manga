@@ -21,8 +21,7 @@ mk_open_remaining_first: bool = True
 
 
 def evaluate(url: str, tested: Tested, pbar: tqdm.std.tqdm) -> None:
-    """
-    Determine if url has a new chapter or not
+    """Determine if url has a new chapter or not
     Store the result in tested and update pbar
     """
     try:
@@ -39,9 +38,7 @@ def evaluate(url: str, tested: Tested, pbar: tqdm.std.tqdm) -> None:
 
 
 def open_new(directory: Path, skip: set[str] | list[str], delay: float) -> bool:
-    """
-    Open each file in directory that has a new chapter ready
-    """
+    """Open each file in directory that has a new chapter ready"""
     if isinstance(skip, list):
         return open_new(directory, set(skip), delay)
     print("Checking arguments...")

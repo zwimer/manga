@@ -5,18 +5,14 @@ __all__ = ("lsf", "mv")
 
 
 def lsf(d: Path) -> list[Path]:
-    """
-    ls all files in d recursively, but ignore likely undesired files
-    """
+    """ls all files in d recursively, but ignore likely undesired files"""
     each: Iterable[Path] = (i.resolve() for i in d.resolve().rglob("*"))
     ignore: set[str] = {".DS_Store"}
     return [i for i in each if i.is_file() and i.name not in ignore]
 
 
 def mv(a: Path, b: Path, *, dryrun: bool = False) -> None:
-    """
-    Rename a to b
-    """
+    """Rename a to b"""
     a = a.resolve()
     b = b.resolve()
     print(f"{a} --> {b}")

@@ -4,9 +4,7 @@ from itertools import chain
 
 @dataclass
 class Tested:
-    """
-    The results of testing every URL
-    """
+    """The results of testing every URL"""
 
     has_new: set[str] = field(default_factory=set)
     ignore: set[str] = field(default_factory=set)

@@ -20,10 +20,11 @@ _skipped = Skipped()
 
 def evaluate_urls(urls: list[URL], update_pbar: Callable[[], None], skip: set[str], delay: int) -> None:
     """
-    :param urls: The list of URLs to test
-    :param update_pbar: A function that updates the progress bar to be called when a URL is tested
-    :param skip: A set of domains to skip
-    :param delay: How many seconds to sleep before testing successive urls
+    Args:
+        urls: The list of URLs to test
+        update_pbar: A function that updates the progress bar to be called when a URL is tested
+        skip: A set of domains to skip
+        delay: How many seconds to sleep before testing successive urls
     """
     try:
         if urls[0].domain in skip:
@@ -54,9 +55,7 @@ def test_sites(
     no_prompt: bool,
     delay: int,
 ) -> bool:
-    """
-    Test each file in directory, print the results open them as needed
-    """
+    """Test each file in directory, print the results open them as needed"""
     skip = {i.split("://")[-1].split("/")[0] for i in skip}
     print("Checking arguments...")
     assert all("." in i for i in skip), "Non-domain in --skip"

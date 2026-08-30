@@ -13,9 +13,7 @@ BROWSER = os.getenv("BROWSER", "Brave Browser")
 
 
 def scrub(url: str) -> str:
-    """
-    Scrub a URL for easy comparison with others
-    """
+    """Scrub a URL for easy comparison with others"""
     url = "".join(url.split("//")[1:])
     if "." in url[:4]:
         url = url.split(".", 1)[1]
@@ -26,8 +24,7 @@ def scrub(url: str) -> str:
 
 
 def read_dir(directory: Path) -> dict[str, str]:
-    """
-    Read a directory and map the scrubbed URLs to their chapter numbers a strings
+    """Read a directory and map the scrubbed URLs to their chapter numbers a strings
     Ignores .swp files but whines about them
     """
     assert directory.is_dir(), f"{directory} is a file"
@@ -44,9 +41,7 @@ def read_dir(directory: Path) -> dict[str, str]:
 
 
 def get_url() -> str:
-    """
-    Get the URL of the current tab
-    """
+    """Get the URL of the current tab"""
     cmd: str = f'tell application "{BROWSER}" to return URL of active tab of front window'
     code, out, err = osascript.run(cmd)
     assert code == 0, err
@@ -54,8 +49,7 @@ def get_url() -> str:
 
 
 def unnumbered_helper(dirs: list[Path]) -> None:
-    """
-    Print out the number of the chapter associated
+    """Print out the number of the chapter associated
     with the manga displayed in the frontmost Brave tab
     """
     for i in dirs:

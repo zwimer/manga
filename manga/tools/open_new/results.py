@@ -9,9 +9,7 @@ from .tested import Tested
 
 
 def handle_results(urls: set[str], tested: Tested, delay: float) -> None:
-    """
-    Print out the test results and open each of the given URLs that should not be ignored
-    """
+    """Print out the test results and open each of the given URLs that should not be ignored"""
     if len(tested.unknown) > 0:
         print("The following domains were not known:")
         print("\t" + "\n\t".join(sorted({get_domain(i) for i in tested.unknown})))

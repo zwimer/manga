@@ -20,15 +20,12 @@ _agents = (
 
 
 def get_domain(url: str) -> str:
-    """
-    Extract the domain portion of a URL
-    """
+    """Extract the domain portion of a URL"""
     return tldextract.extract(url).top_domain_under_public_suffix
 
 
 def _test(url: str, fn: Callable[[str], bool], timeout: float, timeout_retries: int, base_delay: float) -> bool:
-    """
-    Return true if the given chapter is found
+    """Return true if the given chapter is found
     If a timeout occurs, retries at most timeout_retries times; sleeps in between
     """
     session = requests.Session()
@@ -56,8 +53,7 @@ def _test(url: str, fn: Callable[[str], bool], timeout: float, timeout_retries: 
 
 
 def test(url: str, timeout: float = 7.5, timeout_retries: int = 0, base_delay: float = 7.5) -> bool:
-    """
-    Return true if the given chapter is found
+    """Return true if the given chapter is found
     If a timeout occurs, retries at most timeout_retries times; sleeps in between
     """
     domain: str = get_domain(url)

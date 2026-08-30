@@ -6,9 +6,7 @@ from manga.utils import extract_url_from_contents, split_on_num, mv
 
 
 def inc_str(x: str) -> str:
-    """
-    Increment the last number in x
-    """
+    """Increment the last number in x"""
     assert any(c.isdigit() for c in x), f"No number detected in {x}"
     left, num, right = split_on_num(x)
     new: str = str((int(num) if num == int(num) else num) + 1)
@@ -16,8 +14,7 @@ def inc_str(x: str) -> str:
 
 
 def find_url(data: str, ext: str) -> tuple[str, str, str]:
-    """
-    Split data into by the found URL
+    """Split data into by the found URL
     Return the data on the left, the URL, and the data on the right
     """
     url: str = extract_url_from_contents(data, ext)
@@ -27,9 +24,7 @@ def find_url(data: str, ext: str) -> tuple[str, str, str]:
 
 
 def inc_chapter(file: Path, url_only: bool, yes: bool, dryrun: bool) -> bool:
-    """
-    Increment the number in both the URL and name of file
-    """
+    """Increment the number in both the URL and name of file"""
     absolute: Path = file.absolute()
     file = file.resolve()
     assert file == absolute, f"{file} should not contain symlinks"
