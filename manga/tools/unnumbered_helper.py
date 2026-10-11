@@ -45,7 +45,7 @@ def get_url() -> str:
     cmd: str = f'tell application "{BROWSER}" to return URL of active tab of front window'
     code, out, err = osascript.run(cmd)
     assert code == 0, err
-    return out
+    return out.strip("\n")
 
 
 def unnumbered_helper(dirs: list[Path]) -> None:

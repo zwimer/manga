@@ -89,7 +89,7 @@ def close_tab(tab: Tab) -> None:
 
 
 def check_unwanted_tab(tab: Tab) -> bool:
-    """Check if the given tab is wanted based only on its contents"""
+    """Return Ture if the given tab is unwanted"""
     if tab.title in {
         "",
         "Error 404",
@@ -106,13 +106,16 @@ def check_unwanted_tab(tab: Tab) -> bool:
             return not tab.url.split(tld, 1)[1].lstrip("/")
         case "manhuaus.com":
             return "</i>LATESTMANGARELEASES</h2>" in re.sub(r"\s+", "", tab.html, flags=re.MULTILINE)
+        case "omegascans.org":
+            bad = '<p class="text-muted-foreground text-xs text-center lg:text-base">You have to be a subscriber or buy this chapter if you want to have access to this content.</p>'
+            return bad in tab.html
         case "philiascans.org":
-            bad = (
+            bad_opts = (
                 """>You're missing<br>the <span class="reg-accent">free unlock<""",
                 ">Set, lettered and waiting. Open it once and it’s yours for good — tonight, or years from now.<",
                 'aria-label="404 — page not found"',
             )
-            return any(i in tab.html for i in bad)
+            return any(i in tab.html for i in bad_opts)
     return False
 
 
