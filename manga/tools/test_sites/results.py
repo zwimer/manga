@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, cast
+from typing import cast
 import subprocess
 import termios
 import sys
@@ -6,10 +6,7 @@ import sys
 from tqdm import tqdm
 
 from .status import NoOpen, ToOpen, Broken, Exists, Missing, Tiny, PointFive
-
-if TYPE_CHECKING:
-    from .state import State, URL
-
+lazy from .state import State, URL
 
 _order = (Broken, Exists, Missing, PointFive, Tiny)
 

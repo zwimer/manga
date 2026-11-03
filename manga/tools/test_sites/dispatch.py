@@ -1,15 +1,12 @@
-from typing import TYPE_CHECKING, Protocol
 from concurrent.futures import thread
+lazy from concurrent.futures import Future
+lazy from collections.abc import Callable
+lazy from typing import Any
+from typing import Protocol
 
 from rich.progress import Progress, BarColumn, TextColumn, TimeRemainingColumn, MofNCompleteColumn, TaskProgressColumn
 
-if TYPE_CHECKING:
-    from concurrent.futures import Future
-    from collections.abc import Callable
-    from typing import Any
-
-if TYPE_CHECKING:
-    from .state import URL, State
+lazy from .state import URL, State
 
 
 class _ThreadHandler(thread.ThreadPoolExecutor):

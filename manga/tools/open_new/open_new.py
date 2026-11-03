@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+lazy from typing import Any
 from signal import Signals
 from pathlib import Path
 import os
@@ -12,10 +12,6 @@ from manga import sites
 from .thread_handler import ThreadHandler
 from .results import handle_results
 from .tested import Tested
-
-if TYPE_CHECKING:
-    from typing import Any
-
 
 mk_open_remaining_first: bool = True
 

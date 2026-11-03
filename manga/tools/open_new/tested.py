@@ -1,5 +1,4 @@
 from dataclasses import dataclass, asdict, field
-from itertools import chain
 
 
 @dataclass
@@ -14,4 +13,4 @@ class Tested:
 
     @property
     def tested(self) -> set[str]:
-        return set(chain.from_iterable(asdict(self).values()))
+        return {*it for it in asdict(self).values()}

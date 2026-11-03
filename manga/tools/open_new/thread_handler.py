@@ -1,11 +1,8 @@
-from typing import TYPE_CHECKING, Protocol
+lazy from concurrent.futures import Future
 from concurrent.futures import thread
-from typing import Self
+from typing import Protocol, Self
+lazy from typing import Any
 import signal
-
-if TYPE_CHECKING:
-    from concurrent.futures import Future
-    from typing import Any
 
 
 class _SignalHandler(Protocol):

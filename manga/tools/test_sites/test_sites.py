@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+lazy from collections.abc import Callable
 from pathlib import Path
 from time import sleep
 import traceback
@@ -10,10 +10,6 @@ from .dispatch import dispatch
 from .state import State, URL
 from .status import Skipped
 from .results import results
-
-if TYPE_CHECKING:
-    from collections.abc import Callable
-
 
 _skipped = Skipped()
 
