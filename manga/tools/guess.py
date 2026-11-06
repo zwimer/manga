@@ -168,7 +168,7 @@ def disp_warning(x: str) -> None:
     print("\n".join((boarder, blank, middle, blank, boarder)))  # noqa: FLY002
 
 
-# pylint: disable=too-many-locals
+# pylint: disable-next=too-many-locals
 def guess_single(raw: Path, data: dict[str, Path], yes: bool, force: bool, dryrun: bool) -> bool:
     """Try to replace the file in old for the same manga with raw, editing the title as needed
     Return true on success
